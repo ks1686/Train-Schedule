@@ -2,14 +2,16 @@
 
 -- USE trains; 
 
--- CREATE TABLE customer (
---     id INT AUTO_INCREMENT PRIMARY KEY,
---     username VARCHAR(50) NOT NULL UNIQUE,
---     password VARCHAR(50) NOT NULL,
---     first_name VARCHAR(50),
---     last_name VARCHAR(50)
--- );
+-- Table: Customer
+-- CREATE TABLE Customer (
+--    customerId INT AUTO_INCREMENT PRIMARY KEY,
+--    firstName VARCHAR(25),
+--    lastName VARCHAR(25),
+--    username VARCHAR(10) UNIQUE,
+--    password VARCHAR(50),
+--    email VARCHAR(100) UNIQUE
+--);
 
 -- INSERT INTO customer (username, password, first_name, last_name)
--- VALUES ('user1', 'password1', 'John', 'Doe'),
---        ('user2', 'password2', 'Jane', 'Smith');
+-- VALUES ('John, Doe, 'user1', 'password1', 'john@aol.com'),
+--        ('Jane, Doe, 'user2', 'password2', 'jane@hotmail.com'),
