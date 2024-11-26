@@ -1,3 +1,5 @@
+-- USE THIS TO TEST --
+
 -- CREATE DATABASE trains;
 
 -- USE trains; 
@@ -12,6 +14,9 @@
 --    email VARCHAR(100) UNIQUE
 --);
 
--- INSERT INTO customer (username, password, first_name, last_name)
--- VALUES ('John, Doe, 'user1', 'password1', 'john@aol.com'),
---        ('Jane, Doe, 'user2', 'password2', 'jane@hotmail.com'),
+--INSERT INTO
+--    customer (firstName, lastName, username, password, email)
+--VALUES
+--    ('John', 'Doe', 'user1', 'password1', 'john@aol.com'),
+--    ('Jane', 'Doe', 'user2', 'password2', 'jane@hotmail.com');
+
