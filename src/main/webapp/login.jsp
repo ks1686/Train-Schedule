@@ -1,7 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
-<%@ page import="java.io.*,java.util.*,java.sql.*"%>
-<%@ page import="javax.servlet.http.*,javax.servlet.*"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
+    pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
+<%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*"%>
 
 <!DOCTYPE html>
 <html>
@@ -70,6 +69,22 @@
             font-size: 14px;
             margin-bottom: 10px;
         }
+
+        .register-link {
+            display: block;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .register-link a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +96,6 @@
             String password = request.getParameter("password");
             String errorMessage = null;
 
-            // Check for a logout success parameter
             String logout = request.getParameter("logout");
             if ("true".equals(logout)) {
         %>
@@ -96,7 +110,7 @@
                 ResultSet rs = null;
 
                 try {
-                    String query = "SELECT * FROM trains.customers WHERE username = ? AND password = ?";
+                    String query = "SELECT * FROM Customer WHERE username = ? AND password = ?";
                     ps = conn.prepareStatement(query);
                     ps.setString(1, username);
                     ps.setString(2, password);
@@ -115,7 +129,7 @@
                 } finally {
                     if (rs != null) rs.close();
                     if (ps != null) ps.close();
-                    if (conn != null) appdb.closeConnection(conn);  // Added null check for conn
+                    if (conn != null) appdb.closeConnection(conn);
                 }
             }
         %>
@@ -129,6 +143,10 @@
             <input type="password" name="password" placeholder="Password" required /><br>
             <input type="submit" value="Login" />
         </form>
+
+        <div class="register-link">
+            <p>Don't have an account? <a href="register.jsp">Create one here</a></p>
+        </div>
     </div>
 </body>
 </html>
