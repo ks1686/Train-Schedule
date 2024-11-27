@@ -17,10 +17,6 @@
             height: 100vh;
         }
 
-        h1 {
-            color: #4CAF50;
-        }
-
         .header {
             background-color: #4CAF50;
             color: white;
@@ -90,7 +86,7 @@
         }
 
         .search-container input[type="text"] {
-            width: 70%;
+            width: 260px;
             padding: 10px;
             font-size: 14px;
             border-radius: 4px;
@@ -222,7 +218,6 @@
 %>
 
 <div class="header">
-    <h1>Welcome!</h1>
     <div class="username">Hello, <%= username %>!</div>
     <a href="logout.jsp" class="logout-button">Logout</a>
 </div>
@@ -232,12 +227,10 @@
 <% } %>
 
 <div class="main-container">
-    <!-- Top Half: Dashboard -->
     <div class="top-half">
         <h2>Welcome to Your Dashboard</h2>
     </div>
 
-    <!-- Bottom Half: Questions & Answers Section -->
     <div class="bottom-half">
         <h3>Questions and Answers Section:</h3>
         
@@ -251,7 +244,7 @@
 
         <div class="search-container">
             <form method="GET" action="customerWelcome.jsp">
-                <input type="text" name="searchKeyword" placeholder="Search questions..." value="<%= (request.getParameter("searchKeyword") != null) ? request.getParameter("searchKeyword") : "" %>" />
+                <input type="text" name="searchKeyword" placeholder="Search by question keyword" value="<%= (request.getParameter("searchKeyword") != null) ? request.getParameter("searchKeyword") : "" %>" />
                 <input type="submit" value="Search" />
             </form>
         </div>

@@ -5,7 +5,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Manager Dashboard</title>
+    <title>Manager Welcome</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,10 +15,6 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
-        }
-
-        h1 {
-            color: #4CAF50;
         }
 
         .header {
@@ -60,7 +56,6 @@
             border-radius: 4px;
             cursor: pointer;
             text-decoration: none;
-            margin-top: 20px;
         }
 
         .logout-button:hover {
@@ -80,7 +75,6 @@
 %>
 
 <div class="header">
-    <h1>Welcome!</h1>
     <div class="username">Hello, <%= username %>!</div>
     <a href="logout.jsp" class="logout-button">Logout</a>
 </div>

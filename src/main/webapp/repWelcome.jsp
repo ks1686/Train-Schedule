@@ -17,10 +17,6 @@
             height: 100vh;
         }
 
-        h1 {
-            color: #4CAF50;
-        }
-
         .header {
             background-color: #4CAF50;
             color: white;
@@ -62,7 +58,7 @@
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            width: 255px;
+            width: 260px;
             margin-bottom: 5px;
             box-sizing: border-box;
         }
@@ -309,7 +305,6 @@
 %>
 
 <div class="header">
-    <h1>Representative Dashboard</h1>
     <span class="username">Hello, <%= username %></span>
     <a href="logout.jsp" class="logout-button">Logout</a>
 </div>
