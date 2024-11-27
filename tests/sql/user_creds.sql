@@ -47,4 +47,3 @@
 --VALUES 
 --	('111-11-1111', 'emp1Fname', 'emp1Lname', 'rep1', 'rep1', 'Representative'),
 --	('222-22-2222', 'Mgr1Fname', 'Mgr1Lname', 'mgr1', 'mgr1', 'Manager');
-);
