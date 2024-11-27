@@ -95,8 +95,8 @@
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             String errorMessage = null;
-
             String logout = request.getParameter("logout");
+            
             if ("true".equals(logout)) {
         %>
             <div class="logout-message">You have been successfully logged out.</div>
@@ -114,14 +114,38 @@
                     ps = conn.prepareStatement(query);
                     ps.setString(1, username);
                     ps.setString(2, password);
-
                     rs = ps.executeQuery();
 
                     if (rs.next()) {
                         session.setAttribute("username", username);
-                        response.sendRedirect("welcome.jsp");
+                        session.setAttribute("role", "customer");
+                        response.sendRedirect("customerWelcome.jsp");
                     } else {
-                        errorMessage = "Invalid login credentials!";
+                        query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Representative'";
+                        ps = conn.prepareStatement(query);
+                        ps.setString(1, username);
+                        ps.setString(2, password);
+                        rs = ps.executeQuery();
+
+                        if (rs.next()) {
+                            session.setAttribute("username", username);
+                            session.setAttribute("role", "Representative");
+                            response.sendRedirect("repWelcome.jsp");
+                        } else {
+                            query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Manager'";
+                            ps = conn.prepareStatement(query);
+                            ps.setString(1, username);
+                            ps.setString(2, password);
+                            rs = ps.executeQuery();
+
+                            if (rs.next()) {
+                                session.setAttribute("username", username);
+                                session.setAttribute("role", "Manager");
+                                response.sendRedirect("managerWelcome.jsp");
+                            } else {
+                                errorMessage = "Invalid login credentials!";
+                            }
+                        }
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
