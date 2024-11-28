@@ -63,7 +63,7 @@ CREATE TABLE Emp_Mngr (
     FOREIGN KEY (representative_ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Table: Manages
+-- Table: Manages (removed TrainSchedule for now)
 -- CREATE TABLE Manages (
 --     scheduleId INT,
 --     ssn CHAR(11),
