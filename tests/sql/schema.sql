@@ -5,9 +5,9 @@ USE trains;
 -- Table: Station
 CREATE TABLE Station (
     stationId INT AUTO_INCREMENT PRIMARY KEY,
-    Name VARCHAR(50),
-    City VARCHAR(20),
-    State CHAR(2)
+    name VARCHAR(50),
+    city VARCHAR(20),
+    state CHAR(2)
 );
 
 -- Table: TransitLine
@@ -130,7 +130,6 @@ CREATE TABLE RViews (
     FOREIGN KEY (reservationNo) REFERENCES Reservation(reservationNo) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
 
 -- Index for Searching based on Question
 CREATE FULLTEXT INDEX idx_questionText ON Questions (questionText);
