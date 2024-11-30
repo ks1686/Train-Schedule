@@ -1,14 +1,49 @@
 CREATE DATABASE trains;
 USE trains;
 
+-- Transit --
 -- Table: Station
--- CREATE TABLE Station (
---     stationId INT AUTO_INCREMENT PRIMARY KEY,
---     Name VARCHAR(50),
---     City VARCHAR(15),
---     State CHAR(2)
--- );
+CREATE TABLE Station (
+    stationId INT AUTO_INCREMENT PRIMARY KEY,
+    Name VARCHAR(50),
+    City VARCHAR(20),
+    State CHAR(2)
+);
 
+-- Table: TransitLine
+CREATE TABLE TransitLine (
+	lineId INT AUTO_INCREMENT PRIMARY KEY,
+    lineName VARCHAR(25),
+    origin INT NOT NULL,
+    destination INT NOT NULL,
+    departureDateTime DATETIME,
+    arrivalDateTime DATETIME,
+    fare FLOAT,
+    FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table: Train
+CREATE TABLE Train (
+	trainId INT AUTO_INCREMENT PRIMARY KEY,
+    trainName VARCHAR(25),
+	lineId INT NOT NULL,
+    FOREIGN KEY (lineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table: Stop
+CREATE TABLE Stop (
+    stopId INT AUTO_INCREMENT,
+    stopStation INT,
+    stopLine INT,
+    departureDateTime DATETIME,
+    arrivalDateTime DATETIME,
+    PRIMARY KEY(stopId, stopStation, stopLine),
+    FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Human --
 -- Table: Employee
 CREATE TABLE Employee (
     ssn CHAR(11) PRIMARY KEY,
@@ -19,43 +54,8 @@ CREATE TABLE Employee (
     role ENUM('Manager', 'Representative')
 );
 
--- Table: Customer
-CREATE TABLE Customer (
-    customerId INT AUTO_INCREMENT PRIMARY KEY,
-    firstName VARCHAR(25) NOT NULL,
-    lastName VARCHAR(25) NOT NULL,
-    username VARCHAR(10) UNIQUE NOT NULL,
-    password VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL
-);
-
--- Table: TrainSchedule
--- CREATE TABLE TrainSchedule (
---     scheduleId INT AUTO_INCREMENT PRIMARY KEY,
---     lineName VARCHAR(25),
---     trainId INT,
---     origin INT,
---     destination INT,
---     fare FLOAT,
---     departureTime TIME,
---     arrivalTime TIME,
---     FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
--- );
-
--- Table: Stop
--- CREATE TABLE Stop (
---     stopId INT AUTO_INCREMENT PRIMARY KEY,
---     departureTime TIME,
---     arrivalTime TIME,
---     stationId INT,
---     scheduleId INT,
---     FOREIGN KEY (stationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (scheduleId) REFERENCES TrainSchedule(scheduleId) ON DELETE CASCADE ON UPDATE CASCADE
--- );
-
--- Table: Emp_Mngr
-CREATE TABLE Emp_Mngr (
+-- Table: Manages
+CREATE TABLE Manages (
     manager_ssn CHAR(11) NOT NULL,
     representative_ssn CHAR(11) NOT NULL,
     PRIMARY KEY (manager_ssn, representative_ssn),
@@ -63,49 +63,15 @@ CREATE TABLE Emp_Mngr (
     FOREIGN KEY (representative_ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Table: Manages (removed TrainSchedule for now)
--- CREATE TABLE Manages (
---     scheduleId INT,
---     ssn CHAR(11),
---     PRIMARY KEY (scheduleId, ssn),
---     FOREIGN KEY (scheduleId) REFERENCES TrainSchedule(scheduleId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
--- );
-
--- Table: Assists
--- CREATE TABLE Assists (
---     customerId INT,
---     ssn CHAR(11),
---     PRIMARY KEY (customerId, ssn),
---     FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
--- );
-
--- Table: Reservation
--- CREATE TABLE Reservation (
---     reservationNo INT AUTO_INCREMENT PRIMARY KEY,
---     scheduleId INT,
---     Departure TIME,
---     Arrival TIME,
---     totalFare FLOAT,
---     dateReserved DATE,
---     origin INT,
---     destination INT,
---     customerId INT NOT NULL,
---     FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (scheduleId) REFERENCES TrainSchedule(scheduleId) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE
--- );
-
--- Table: View
--- CREATE TABLE View (
---     reservationNo INT,
---     ssn CHAR(11),
---     PRIMARY KEY (reservationNo, ssn),
---     FOREIGN KEY (reservationNo) REFERENCES Reservation(reservationNo) ON DELETE CASCADE ON UPDATE CASCADE,
---     FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
--- );
+-- Table: Customer
+CREATE TABLE Customer (
+    customerId INT AUTO_INCREMENT PRIMARY KEY,
+    firstName VARCHAR(25) NOT NULL,
+    lastName VARCHAR(25) NOT NULL,
+    username VARCHAR(10) UNIQUE NOT NULL,
+    password VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL
+);
 
 -- Table: Questions
 CREATE TABLE Questions (
@@ -126,6 +92,45 @@ CREATE TABLE Answers (
     FOREIGN KEY (questionId) REFERENCES Questions(questionId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (employeeSSN) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- Human to Transit --
+-- Table: SViews
+CREATE TABLE SViews (
+    ssn CHAR(11),
+    stopId INT NOT NULL,
+    stopStation INT NOT NULL,
+    stopLine INT NOT NULL,
+    PRIMARY KEY (ssn, stopId, stopStation, stopLine),
+    FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (stopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table: Reservation
+CREATE TABLE Reservation (
+    reservationNo INT AUTO_INCREMENT PRIMARY KEY,
+    customerId INT NOT NULL,
+    transitLineId INT NOT NULL,
+	originStationId INT,
+    destinationStationId INT,
+    reservationDateTime DATETIME,
+    isRoundTrip BOOLEAN,
+    FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (transitLineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (originStationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (destinationStationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table: RViews
+CREATE TABLE RViews (
+    reservationNo INT,
+    ssn CHAR(11),
+    PRIMARY KEY (reservationNo, ssn),
+    FOREIGN KEY (reservationNo) REFERENCES Reservation(reservationNo) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
 -- Index for Searching based on Question
 CREATE FULLTEXT INDEX idx_questionText ON Questions (questionText);
