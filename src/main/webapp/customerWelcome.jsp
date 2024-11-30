@@ -37,19 +37,21 @@
             flex-direction: column;
             height: 100%;
             padding: 20px;
+            flex-grow: 1;
         }
 
         .top-half {
             flex: 6;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
+            overflow-y: visible;
         }
 
         .bottom-half {
             flex: 4;
-            overflow-y: auto;
+            overflow-y: visible;
             margin-top: 20px;
         }
 
