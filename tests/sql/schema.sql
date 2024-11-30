@@ -12,7 +12,7 @@ CREATE TABLE Station (
 
 -- Table: TransitLine
 CREATE TABLE TransitLine (
-	lineId INT AUTO_INCREMENT PRIMARY KEY,
+    lineId INT AUTO_INCREMENT PRIMARY KEY,
     lineName VARCHAR(25),
     origin INT NOT NULL,
     destination INT NOT NULL,
@@ -20,14 +20,14 @@ CREATE TABLE TransitLine (
     arrivalDateTime DATETIME,
     fare FLOAT,
     FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
-	FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Table: Train
 CREATE TABLE Train (
-	trainId INT AUTO_INCREMENT PRIMARY KEY,
+    trainId INT AUTO_INCREMENT PRIMARY KEY,
     trainName VARCHAR(25),
-	lineId INT NOT NULL,
+    lineId INT NOT NULL,
     FOREIGN KEY (lineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -112,7 +112,7 @@ CREATE TABLE Reservation (
     reservationNo INT AUTO_INCREMENT PRIMARY KEY,
     customerId INT NOT NULL,
     transitLineId INT NOT NULL,
-	originStationId INT,
+    originStationId INT,
     destinationStationId INT,
     reservationDateTime DATETIME,
     isRoundTrip BOOLEAN,
