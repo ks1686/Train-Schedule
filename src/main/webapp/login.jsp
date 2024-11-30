@@ -118,8 +118,8 @@
 
                     if (rs.next()) {
                         session.setAttribute("username", username);
-                        session.setAttribute("role", "customer");
-                        response.sendRedirect("customerWelcome.jsp");
+                        session.setAttribute("role", "Customer");
+                        response.sendRedirect("Customer/customerWelcome.jsp");
                     } else {
                         query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Representative'";
                         ps = conn.prepareStatement(query);
@@ -130,7 +130,7 @@
                         if (rs.next()) {
                             session.setAttribute("username", username);
                             session.setAttribute("role", "Representative");
-                            response.sendRedirect("repWelcome.jsp");
+                            response.sendRedirect("Representative/repWelcome.jsp");
                         } else {
                             query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Manager'";
                             ps = conn.prepareStatement(query);
@@ -141,7 +141,7 @@
                             if (rs.next()) {
                                 session.setAttribute("username", username);
                                 session.setAttribute("role", "Manager");
-                                response.sendRedirect("managerWelcome.jsp");
+                                response.sendRedirect("Manager/managerWelcome.jsp");
                             } else {
                                 errorMessage = "Invalid login credentials!";
                             }
