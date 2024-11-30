@@ -40,7 +40,7 @@
         }
 
         .top-half {
-            flex: 1;
+            flex: 6;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -48,7 +48,7 @@
         }
 
         .bottom-half {
-            flex: 2;
+            flex: 4;
             overflow-y: auto;
             margin-top: 20px;
         }
