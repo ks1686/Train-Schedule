@@ -213,6 +213,12 @@
         response.sendRedirect("../login.jsp");
         return;
     }
+    
+    String role = (String) session.getAttribute("role");
+    if (!role.equals("Representative")) {
+        response.sendRedirect("../403.jsp");
+        return;
+    }
 
     String username = (String) session.getAttribute("username");
     String errorMessage = null;

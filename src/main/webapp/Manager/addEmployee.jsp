@@ -34,6 +34,12 @@
         response.sendRedirect("../login.jsp");
         return;
     }
+    
+    // Check if the user is a manager   
+    if (!session.getAttribute("role").equals("Manager")) {
+        response.sendRedirect("../403.jsp");
+        return;
+    }
 
     String username = (String) session.getAttribute("username");
     Connection conn = null;

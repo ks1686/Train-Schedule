@@ -2,6 +2,18 @@
 <%@ page import="java.io.*, java.sql.*, javax.servlet.http.*, javax.servlet.*"%>
 
 <%
+    
+    if (session == null || session.getAttribute("username") == null) {
+        response.sendRedirect("../login.jsp");
+        return;
+    }
+    
+    // Check if the user is a manager   
+    if (!session.getAttribute("role").equals("Manager")) {
+        response.sendRedirect("../403.jsp");
+        return;
+    }
+
     String username = request.getParameter("username");
     if (username != null) {
         Connection conn = null;

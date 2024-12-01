@@ -147,6 +147,14 @@
         response.sendRedirect("login.jsp");
         return;
     }
+    
+    String role = (String) session.getAttribute("role");
+    System.out.println(role);
+    
+    if (!role.equals("Customer")) {
+        response.sendRedirect("../403.jsp");
+        return;
+    }
 
     String username = (String) session.getAttribute("username");
     String errorMessage = null;

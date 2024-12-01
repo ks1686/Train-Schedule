@@ -134,8 +134,15 @@
 <body>
 
 <% 
+
     if (session == null || session.getAttribute("username") == null) {
         response.sendRedirect("../login.jsp");
+        return;
+    }
+    
+    String role = (String) session.getAttribute("role");
+    if (!role.equals("Manager")) {
+        response.sendRedirect("../403.jsp");
         return;
     }
 
