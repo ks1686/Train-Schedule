@@ -222,19 +222,21 @@
                     <td><%= employee.get("username") %></td>
                     <td><%= employee.get("role") %></td>
                     <td>
-                        <!-- Edit and Delete buttons -->
-                        <form method="POST" action="editEmployee.jsp" style="display: inline;">
-                            <input type="hidden" name="username" value="<%= employee.get("username") %>">
-                            <input type="hidden" name="ssn" value="<%= employee.get("ssn") %>">
-                            <input type="hidden" name="firstName" value="<%= employee.get("firstName") %>">
-                            <input type="hidden" name="lastName" value="<%= employee.get("lastName") %>">
-                            <input type="hidden" name="role" value="<%= employee.get("role") %>">
-                            <button type="submit" class="edit-button">Edit</button>
-                        </form>
-                        <form method="POST" action="deleteEmployee.jsp" style="display: inline;">
-                            <input type="hidden" name="username" value="<%= employee.get("username") %>">
-                            <button type="submit" class="delete-button">Delete</button>
-                        </form>
+                        <% if (!"Manager".equals(employee.get("role"))) { %>
+                            <!-- Edit and Delete buttons -->
+                            <form method="POST" action="editEmployee.jsp" style="display: inline;">
+                                <input type="hidden" name="username" value="<%= employee.get("username") %>">
+                                <input type="hidden" name="ssn" value="<%= employee.get("ssn") %>">
+                                <input type="hidden" name="firstName" value="<%= employee.get("firstName") %>">
+                                <input type="hidden" name="lastName" value="<%= employee.get("lastName") %>">
+                                <input type="hidden" name="role" value="<%= employee.get("role") %>">
+                                <button type="submit" class="edit-button">Edit</button>
+                            </form>
+                            <form method="POST" action="deleteEmployee.jsp" style="display: inline;">
+                                <input type="hidden" name="username" value="<%= employee.get("username") %>">
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        <% } %>
                     </td>
                 </tr>
             <% } %>
@@ -250,10 +252,9 @@
         <input type="text" name="username" placeholder="Username" required>
         <input type="password" name="password" placeholder="Password" required>
         <select name="role" required>
-            <option value="Manager">Manager</option>
             <option value="Representative">Representative</option>
         </select>
-        <button type="submit">Add Employee</button>
+        <button type="submit" <% if (role.equals("Manager")) { %> disabled <% } %>>Add Employee</button>
     </form>
 </div>
 
