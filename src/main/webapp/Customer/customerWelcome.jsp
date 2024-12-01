@@ -199,7 +199,7 @@
 			</select>
 			
 			<label>Date of Departure: </label>
-			<input type="text" name="origin" placeholder="mm/dd/yyyy" required pattern="\d{1,2}/\d{1,2}-\d{4}">
+			<input type="text" name="origin" placeholder="mm/dd/yyyy" required pattern="\d{1,2}/\d{1,2}/\d{4}">
 			
 			<button type="submit">View Schedules</button>
 		</form>
