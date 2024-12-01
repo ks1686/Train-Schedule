@@ -13,7 +13,7 @@ CREATE TABLE Station (
 -- Table: TransitLine
 CREATE TABLE TransitLine (
     lineId INT AUTO_INCREMENT PRIMARY KEY,
-    lineName VARCHAR(25),
+    lineName VARCHAR(50),
     origin INT NOT NULL,
     destination INT NOT NULL,
     departureDateTime DATETIME,

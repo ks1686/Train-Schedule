@@ -135,10 +135,7 @@
 
     String username = (String) session.getAttribute("username");
     String errorMessage = null;
-    List<String> questions = new ArrayList<>();
-    List<String> answers = new ArrayList<>();
-    List<String> questionUsernames = new ArrayList<>();
-    List<Integer> questionIds = new ArrayList<>();
+    List<Station> uniqueStations = new ArrayList<>();
 
     Connection conn = null;
     PreparedStatement ps = null;
@@ -148,49 +145,16 @@
         ApplicationDB appdb = new ApplicationDB();
         conn = appdb.getConnection();
 
-        String searchKeyword = request.getParameter("searchKeyword");
-        String query = "SELECT q.questionId, q.questionText, a.answerText, c.username FROM Questions q " + 
-                       "LEFT JOIN Answers a USING (questionId) " +
-                       "JOIN Customer c USING (customerId) " +
-                       "WHERE q.customerId = (SELECT customerId FROM Customer WHERE username = ?)";
-        
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            query += " AND LOWER(q.questionText) LIKE LOWER(?)";
-        }
+        String query = "SELECT DISTINCT s.stationId, s.name, s.city, s.state FROM Stop " + 
+                       "JOIN Station s ON Stop.stopStation = s.stationId";
         
         ps = conn.prepareStatement(query);
-        ps.setString(1, username);
-        if (searchKeyword != null && !searchKeyword.trim().isEmpty()) {
-            ps.setString(2, "%" + searchKeyword.toLowerCase() + "%");
-        }
-        
         rs = ps.executeQuery();
 
-        while (rs.next()) {
-            questionIds.add(rs.getInt("questionId"));
-            questions.add(rs.getString("questionText"));
-            answers.add(rs.getString("answerText") != null ? rs.getString("answerText") : "");
-            questionUsernames.add(rs.getString("username"));
+        while (rs.next()) {        	
+        	uniqueStations.add(new Station(rs.getInt("stationId"), rs.getString("name"),rs.getString("city"), rs.getString("state")));
         }
-
-        String newQuestion = request.getParameter("newQuestion");
-        if (newQuestion != null && !newQuestion.isEmpty()) {
-            PreparedStatement ps2 = null;
-            try {
-                String insertQuestionQuery = "INSERT INTO Questions (customerId, questionText) " +
-                                             "VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?)";
-                ps2 = conn.prepareStatement(insertQuestionQuery);
-                ps2.setString(1, username);
-                ps2.setString(2, newQuestion);
-                ps2.executeUpdate();
-                response.sendRedirect("customerWelcome.jsp");
-            } catch (SQLException e) {
-                errorMessage = "Error submitting your question: " + e.getMessage();
-            } finally {
-                if (ps2 != null) ps2.close();
-            }
-        }
-
+        // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
     } catch (SQLException e) {
         errorMessage = "Error loading questions and answers: " + e.getMessage();
     } finally {
@@ -215,16 +179,42 @@
 
 <div class="main-container">
     <div class="top-half">
+		<!--  book reservations  -->
+		<h3>Book Reservation</h3>
+		<form method="POST" action="viewSchedules.jsp" style="display: inline">
+			<label>Origin: </label>
+			<select name="origin" required>
+				<option value=""></option>
+				<% for (Station station : uniqueStations) { %>
+					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+				<% } %>
+			</select>
+			
+			<label>Destination: </label>
+			<select name="origin" required>
+				<option value=""></option>
+				<% for (Station station : uniqueStations) { %>
+					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+				<% } %>
+			</select>
+			
+			<label>Date of Departure: </label>
+			<input type="text" name="origin" placeholder="mm/dd/yyyy" required pattern="\d{1,2}/\d{1,2}-\d{4}">
+			
+			<button type="submit">View Schedules</button>
+		</form>
 		
+		<!--  view reservations  -->
+		<h3>View Made Reservations</h3>
     </div>
  
 
     <div class="bottom-half">	        
 		<form method="POST" action="askQuestion.jsp" style="display: inline">
-			<button type="submit" class="viewQuestions">Speak to a Representative</button>
+			<button type="submit" class="viewQuestions">Speak with a Representative</button>
 		</form>
     </div>
-
+</div>
 
 </body>
 </html>
