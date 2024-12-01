@@ -110,7 +110,7 @@
                 ResultSet rs = null;
 
                 try {
-                    String query = "SELECT * FROM Customer WHERE username = ? AND password = ?";
+                    String query = "SELECT * FROM Customer WHERE BINARY username = ? AND BINARY password = ?";
                     ps = conn.prepareStatement(query);
                     ps.setString(1, username);
                     ps.setString(2, password);
@@ -121,7 +121,7 @@
                         session.setAttribute("role", "Customer");
                         response.sendRedirect("Customer/customerWelcome.jsp");
                     } else {
-                        query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Representative'";
+                        query = "SELECT * FROM Employee WHERE BINARY username = ? AND BINARY password = ? AND role = 'Representative'";
                         ps = conn.prepareStatement(query);
                         ps.setString(1, username);
                         ps.setString(2, password);
@@ -132,7 +132,7 @@
                             session.setAttribute("role", "Representative");
                             response.sendRedirect("Representative/repWelcome.jsp");
                         } else {
-                            query = "SELECT * FROM Employee WHERE username = ? AND password = ? AND role = 'Manager'";
+                            query = "SELECT * FROM Employee WHERE BINARY username = ? AND BINARY password = ? AND role = 'Manager'";
                             ps = conn.prepareStatement(query);
                             ps.setString(1, username);
                             ps.setString(2, password);
