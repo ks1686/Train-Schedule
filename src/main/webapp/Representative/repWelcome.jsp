@@ -437,7 +437,7 @@
 
 <div class="header">
     <span class="username">Hello, <%= username %></span>
-    <a href="logout.jsp" class="logout-button">Logout</a>
+    <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
 <div class="main-container">
