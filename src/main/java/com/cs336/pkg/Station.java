@@ -15,13 +15,13 @@ public class Station {
 	
 	public int getStationId() { return stationId; }
 	
-	public String getname() { return name; }
+	public String getName() { return name; }
 	
 	public String getCity() { return city; }
 	
 	public String getState() { return state; }
 	
-	public String toString() { return name + " - " + city + ", " + state; }
+	public String toString() { return getName() + " - " + getCity() + ", " + getState(); }
 	
 	@Override
 	public int hashCode() {
