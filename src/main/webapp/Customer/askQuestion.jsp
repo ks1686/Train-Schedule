@@ -27,7 +27,7 @@
         .header {
             background-color: #4CAF50;
             color: white;
-            padding: 10px 20px;
+            padding: 0px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,27 +43,12 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 20px;
+            padding: 50px;
             flex-grow: 1;
-        }
-
-        .top-half {
-            flex: 6;
-            display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             overflow-y: visible;
-        }
-
-        .bottom-half {
-            flex: 1;
-            overflow-y: visible;
-            margin-top: 20px;
-			display: block;
-			margin: auto;
-		    justify-content: center;
-		    align-items: center;
         }
 
         .form-container {
@@ -76,9 +61,38 @@
             margin: 8px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
-        }    
+        }
 
-        .viewQuestions {
+        .question-item, .answer-item {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .answer-item {
+            background-color: #e8f5e9;
+            padding: 10px;
+            margin-top: 10px;
+            border-left: 5px solid #4CAF50;
+        }
+
+        .search-container {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: 260px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        .search-container input[type="submit"] {
             padding: 10px 20px;
             font-size: 14px;
             background-color: #4CAF50;
@@ -86,6 +100,10 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+        }
+
+        .search-container input[type="submit"]:hover {
+            background-color: #45a049;
         }
 
         .form-container textarea {
@@ -138,7 +156,6 @@
     List<String> questions = new ArrayList<>();
     List<String> answers = new ArrayList<>();
     List<String> questionUsernames = new ArrayList<>();
-    List<Integer> questionIds = new ArrayList<>();
 
     Connection conn = null;
     PreparedStatement ps = null;
@@ -149,7 +166,7 @@
         conn = appdb.getConnection();
 
         String searchKeyword = request.getParameter("searchKeyword");
-        String query = "SELECT q.questionId, q.questionText, a.answerText, c.username FROM Questions q " + 
+        String query = "SELECT q.questionText, a.answerText, c.username FROM Questions q " + 
                        "LEFT JOIN Answers a USING (questionId) " +
                        "JOIN Customer c USING (customerId) " +
                        "WHERE q.customerId = (SELECT customerId FROM Customer WHERE username = ?)";
@@ -167,7 +184,6 @@
         rs = ps.executeQuery();
 
         while (rs.next()) {
-            questionIds.add(rs.getInt("questionId"));
             questions.add(rs.getString("questionText"));
             answers.add(rs.getString("answerText") != null ? rs.getString("answerText") : "");
             questionUsernames.add(rs.getString("username"));
@@ -206,6 +222,8 @@
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
+    
+	<h3>Speak to a Representative</h3>
     <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
@@ -214,17 +232,36 @@
 <% } %>
 
 <div class="main-container">
-    <div class="top-half">
-		
-    </div>
- 
-
     <div class="bottom-half">	        
-		<form method="POST" action="askQuestion.jsp" style="display: inline">
-			<button type="submit" class="viewQuestions">Speak to a Representative</button>
-		</form>
-    </div>
+        <div class="form-container">
+            <h3>Ask a New Question:</h3>
+            <form method="POST" action="askQuestion.jsp">
+                <textarea name="newQuestion" rows="4" placeholder="Write your question here" required></textarea><br>
+                <input type="submit" value="Submit Question" />
+            </form>
+        </div>
 
+		<details>
+			<summary>View Previous Questions</summary>
+	        <div class="search-container">
+	            <form method="GET" action="askQuestion.jsp">
+	                <input type="text" name="searchKeyword" placeholder="Search by question keyword" value="<%= (request.getParameter("searchKeyword") != null) ? request.getParameter("searchKeyword") : "" %>" />
+	                <input type="submit" value="Search" />
+	            </form>
+	        </div>
+	
+	        <div class="question-section">
+	            <% for (int i = 0; i < questions.size(); i++) { %>
+	                <div class="question-item">
+	                    <p><strong class="label-bold">Posted by:</strong> <%= questionUsernames.get(i) %></p>
+	                    <h3 class="question-text">Q: <%= questions.get(i) %></h3>
+	                    <p><strong class="label-bold">A:</strong> <%= (answers.get(i) != null && !answers.get(i).isEmpty()) ? answers.get(i) : "" %></p>
+	                </div>
+	            <% } %>
+	        </div>
+		</details>
+    </div>
+</div>
 
 </body>
 </html>
