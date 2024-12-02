@@ -1,6 +1,84 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" import="java.io.*, java.sql.*"%>
 <%@ page import="com.cs336.pkg.*"%>
 
+<style>
+    /* CSS from managerWelcome.jsp */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+    }
+
+    .header {
+        background-color: #333;
+        color: #fff;
+        padding: 15px 20px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        background-color: #fff;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+
+    h2 {
+        text-align: center;
+        margin-top: 20px;
+        color: #333;
+    }
+
+    .compact-button {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        background-color: #4CAF50;
+        color: white;
+        display: inline-block;
+        margin: 10px 0;
+    }
+
+    .compact-button:hover {
+        background-color: #45a049;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #333;
+        color: white;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+
+
 <%
     // Check if the session is valid and the user is a manager
     if (session == null || session.getAttribute("username") == null) {
@@ -15,6 +93,13 @@
 
     String month = request.getParameter("month");
     String year = request.getParameter("year");
+
+    // Check if the month and year are provided
+    if (month == null || year == null) {
+        out.println("<p>Error: Please provide the month and year to generate the sales report.</p>");
+        return;
+    }
+
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -37,8 +122,7 @@
         ps.setInt(2, Integer.parseInt(year));
         rs = ps.executeQuery();
 
-        // Display results in a table format
-        out.println("<!DOCTYPE html>");
+        // Displaying the report table
         out.println("<html>");
         out.println("<head><title>Sales Report</title></head>");
         out.println("<body>");
@@ -57,17 +141,16 @@
             String lineName = rs.getString("Line Name");
             int totalReservations = rs.getInt("Total Reservations");
             double totalRevenue = rs.getDouble("Total Revenue");
-
             out.println("<tr>");
             out.println("<td>" + lineName + "</td>");
             out.println("<td>" + totalReservations + "</td>");
             out.println("<td>" + String.format("$%.2f", totalRevenue) + "</td>");
             out.println("</tr>");
         }
-        
+
         out.println("</tbody>");
         out.println("</table>");
-        out.println("<br><a href='managerWelcome.jsp'>Back to Dashboard</a>");
+        out.println("<br><button class='compact-button' onclick=\"window.location.href='managerWelcome.jsp'\">Back to Dashboard</button>");
         out.println("</body>");
         out.println("</html>");
 
