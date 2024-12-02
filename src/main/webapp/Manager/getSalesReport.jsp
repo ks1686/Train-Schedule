@@ -1,6 +1,24 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" import="java.io.*, java.sql.*"%>
 <%@ page import="com.cs336.pkg.*"%>
 
+<style>
+    .compact-button {
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        cursor: pointer;
+        border: none;
+        background-color: #4CAF50;
+        color: white;
+        display: inline-block; /* Make the button only as wide as the content */
+        margin: 10px 0; /* Add margin for spacing */
+    }
+
+    .compact-button:hover {
+        background-color: #45a049;
+    }
+</style>
+
 <%
     // Check if the session is valid and the user is a manager
     if (session == null || session.getAttribute("username") == null) {
@@ -37,8 +55,7 @@
         ps.setInt(2, Integer.parseInt(year));
         rs = ps.executeQuery();
 
-        // Display results in a table format
-        out.println("<!DOCTYPE html>");
+        // Displaying the report table
         out.println("<html>");
         out.println("<head><title>Sales Report</title></head>");
         out.println("<body>");
@@ -57,17 +74,16 @@
             String lineName = rs.getString("Line Name");
             int totalReservations = rs.getInt("Total Reservations");
             double totalRevenue = rs.getDouble("Total Revenue");
-
             out.println("<tr>");
             out.println("<td>" + lineName + "</td>");
             out.println("<td>" + totalReservations + "</td>");
             out.println("<td>" + String.format("$%.2f", totalRevenue) + "</td>");
             out.println("</tr>");
         }
-        
+
         out.println("</tbody>");
         out.println("</table>");
-        out.println("<br><a href='managerWelcome.jsp'>Back to Dashboard</a>");
+        out.println("<br><button class='compact-button' onclick=\"window.location.href='managerWelcome.jsp'\">Back to Dashboard</button>");
         out.println("</body>");
         out.println("</html>");
 
