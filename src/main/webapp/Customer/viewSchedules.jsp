@@ -183,7 +183,21 @@
         			rs2.getFloat("Fare")));
         }
         
-        //String query3 = 
+        String query3 = "SELECT tl.lineId AS LineId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
+		        		"FROM TransitLine tl " +
+		        		"JOIN Stop stop ON tl.lineId = stop.stopLine " +
+		        		"JOIN Station s ON stop.stopStation = s.stationId " +
+		        		"ORDER BY stop.departureDateTime ASC";
+        
+        PreparedStatement ps3 = conn.prepareStatement(query3);
+        ResultSet rs3 = ps3.executeQuery();
+        
+        while (rs3.next()) {
+        	int lineId = rs3.getInt("LineId");
+        	if (scheduleRes.containsKey(lineId)) {
+        		scheduleRes.get(lineId).addStop(rs3.getInt("StationId"), rs3.getString("StationName"), rs3.getString("StationCity"), rs3.getString("StationState"), rs3.getString("ArrivalDateTime"), rs3.getString("DepartureDateTime"));
+        	}
+        }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
     } finally {
@@ -265,8 +279,51 @@
                     <td><%= sched.getDepartureDateTime() %></td>
                     <td><%= sched.getDestination() %></td>
                     <td><%= sched.getArrivalDateTime() %></td>
-                    <td></td>
-                    <td>$<%= String.format("%.02f", sched.getLineFare()) %></td>
+                    <td>
+                    	<details>
+                    		<summary>View Stops</summary>
+                    		<table>
+                    		<thead>
+                    			<tr>
+                    				<th>Station</th>
+                    				<th>Arrival Time</th>
+                    				<th>Departure Time</th>
+                    				<th>Estimated Fare</th>
+                    			</tr>
+                    		</thead>
+                    		<tbody>
+                    			<%
+                    			List<Object[]> lineStops = sched.getStops();
+                    			for (int ii = 0; ii < lineStops.size(); ii++) {
+                    				Object[] stop = lineStops.get(ii);
+                    				String stationName = stop[0].toString();
+                    				String arrivalTime = (String) stop[1], departureTime = (String) stop[2];
+                    				String color = (String) stop[3];
+                    				boolean bold = (boolean) stop[4];
+                    				
+                    				float estimatedFare = sched.getEstimatedFare(ii);
+                    				String estFareStr = String.format("$%.2f", estimatedFare);
+                    				if (estimatedFare == -1) estFareStr = "N/A";
+                    				
+                    				if (bold) {
+                    					stationName = "<b>" + stationName + "</b>";
+                    					arrivalTime = "<b>" + arrivalTime + "</b>";
+                    					departureTime = "<b>" + departureTime + "</b>";
+                    					estFareStr = "<b>" + estFareStr + "</b>";
+                    				}
+                    			%>
+	                    			<tr>
+	                    				<td style="color:<%= color %>"><%= stationName %></td>
+	                    				<td style="color:<%= color %>"><%= arrivalTime %></td>
+	                    				<td style="color:<%= color %>"><%= departureTime %></td>
+	                    				<td style="color:<%= color %>"><%= estFareStr %></td>
+	                    			</tr>
+	                    		<% } %>
+                    		</tbody>
+                    		</table>
+                    	</details>
+                    </td>
+                    <td>$<%= String.format("%.02f", sched.getEstimatedFare()) %></td>
                     <td>
 						some action
                     </td>
