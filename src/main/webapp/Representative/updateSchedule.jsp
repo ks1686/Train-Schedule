@@ -4,7 +4,7 @@
 
 <%
     if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("../login.jsp");
         return;
     }
     
