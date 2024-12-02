@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Customer Welcome</title>
+    <title>View Schedules</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -136,6 +136,11 @@
     String username = (String) session.getAttribute("username");
     String errorMessage = null;
     List<Station> uniqueStations = new ArrayList<>();
+    List<LineSchedule> scheduleRes = new ArrayList<>();
+    
+    String originStationId = request.getParameter("origin");
+    String destinationStationId = request.getParameter("destination");
+    String reservationDate = request.getParameter("reservationDate");
 
     Connection conn = null;
     PreparedStatement ps = null;
@@ -155,6 +160,26 @@
         	uniqueStations.add(new Station(rs.getInt("stationId"), rs.getString("name"),rs.getString("city"), rs.getString("state")));
         }
         // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
+        
+        String query2 = "SELECT tl.lineName AS LineName, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
+        				"s2.stationId AS DestinationStationId, s2.name AS DestinationStationName, s2.city AS DestinationCity, s2.state AS DestinationState, stop2.arrivalDateTime AS ArrivalDateTime, tl.fare AS Fare " +
+		        		"FROM Station s1 " +
+		        		"JOIN Stop stop1 ON s1.stationId = stop1.stopStation " +
+		        		"JOIN TransitLine tl ON stop1.stopLine = tl.lineId " +
+		        		"JOIN Stop stop2 ON tl.lineId = stop2.stopLine " +
+		        		"JOIN Station s2 ON stop2.stopStation = s2.stationId " +
+		        		"WHERE s1.stationId = ? AND s2.stationId = ? AND CAST(stop1.departureDateTime AS DATE) = ? AND stop1.departureDateTime < stop2.arrivalDateTime";
+        
+        PreparedStatement ps2 = conn.prepareStatement(query2);
+        ps2.setString(1, originStationId);
+        ps2.setString(2, destinationStationId);
+        ps2.setString(3, reservationDate);
+        ResultSet rs2 = ps2.executeQuery();
+        
+        while (rs2.next()) {
+        	scheduleRes.add(new LineSchedule(rs2.getString("LineName"), rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
+        			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), rs2.getInt("Fare")));
+        }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
     } finally {
@@ -180,13 +205,16 @@
 <div class="main-container">
     <div class="top-half">
 		<!--  book reservations  -->
-		<h3>Book Reservation</h3>
+		<h3>View Alternate Schedules</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">
 			<label>Origin: </label>
 			<select name="origin" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+					<option value="<%= station.getStationId() %>"
+					<%= station.getStationId() == Integer.valueOf(originStationId) ? "selected" : "" %>>
+						<%= station.toString() %>
+					</option>
 				<% } %>
 			</select>
 			
@@ -194,20 +222,49 @@
 			<select name="destination" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+					<option value="<%= station.getStationId() %>"
+					<%= station.getStationId() == Integer.valueOf(destinationStationId) ? "selected" : "" %>>
+						<%= station.toString() %>
+					</option>
 				<% } %>
 			</select>
 			
 			<label>Date of Departure: </label>	            
-            <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>">
+            <input type="date" name="reservationDate" required value="<%= reservationDate %>">
 			
 			<button type="submit">View Schedules</button>
 		</form>
 		
-		<!--  view reservations  -->
-		<h3>Upcoming Reservations</h3>
-		
-		<h3>Past Reservations</h3> <!-- collapsible -->
+		<h3>Book Reservation</h3>
+		<table class="reservation-table">
+        <thead>
+            <tr>
+                <th>Transit Line</th>
+                <th>Origin</th>
+                <th>Departure Time</th>
+                <th>Destination</th>
+                <th>Arrival Time</th>
+                <th>Path</th>
+                <th>Fare</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <% for (LineSchedule sched : scheduleRes) { %>
+                <tr>
+                    <td><%= sched.getLineName() %></td>
+                    <td><%= sched.getOrigin() %></td>
+                    <td><%= sched.getDepartureDateTime() %></td>
+                    <td><%= sched.getDestination() %></td>
+                    <td><%= sched.getArrivalDateTime() %></td>
+                    <td>$<%= sched.getLineFare() %></td>
+                    <td>
+						some action
+                    </td>
+                </tr>
+            <% } %>
+        </tbody>
+	    </table>
     </div>
  
 
