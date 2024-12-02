@@ -138,6 +138,7 @@
             background-color: #d32f2f;
         }
         
+        /* Common styles for the form and report section */
         .sales-report-form {
             background-color: #ffffff;
             padding: 20px;
