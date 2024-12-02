@@ -106,10 +106,30 @@
         .logout-button:hover {
             background-color: #d32f2f;
         }
+               
 
-        .question-text {
-            font-size: 16px;
-            margin-bottom: 8px;
+        .reservation-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .reservation-table th, .employee-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .reservation-table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .reservation-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .reservation-table tr:hover {
+            background-color: #f1f1f1;
         }
 
         .label-bold {
@@ -161,7 +181,7 @@
         }
         // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
         
-        String query2 = "SELECT tl.lineName AS LineName, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
+        String query2 = "SELECT tl.lineId AS LineId, tl.lineName AS LineName, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
         				"s2.stationId AS DestinationStationId, s2.name AS DestinationStationName, s2.city AS DestinationCity, s2.state AS DestinationState, stop2.arrivalDateTime AS ArrivalDateTime, tl.fare AS Fare " +
 		        		"FROM Station s1 " +
 		        		"JOIN Stop stop1 ON s1.stationId = stop1.stopStation " +
@@ -177,8 +197,10 @@
         ResultSet rs2 = ps2.executeQuery();
         
         while (rs2.next()) {
-        	scheduleRes.add(new LineSchedule(rs2.getString("LineName"), rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
-        			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), rs2.getInt("Fare")));
+        	scheduleRes.add(new LineSchedule(rs2.getInt("LineId"), rs2.getString("LineName"), 
+        			rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
+        			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), 
+        			rs2.getFloat("Fare")));
         }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
@@ -257,7 +279,8 @@
                     <td><%= sched.getDepartureDateTime() %></td>
                     <td><%= sched.getDestination() %></td>
                     <td><%= sched.getArrivalDateTime() %></td>
-                    <td>$<%= sched.getLineFare() %></td>
+                    <td></td>
+                    <td>$<%= String.format("%.02f", sched.getLineFare()) %></td>
                     <td>
 						some action
                     </td>

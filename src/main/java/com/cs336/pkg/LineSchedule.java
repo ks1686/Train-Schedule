@@ -1,6 +1,7 @@
 package com.cs336.pkg;
 
 public class LineSchedule {
+	private int lineId;
 	private String lineName;
 	
 	private Station origin;
@@ -9,10 +10,11 @@ public class LineSchedule {
 	private Station destination;
 	private String arrivalDateTime;
 	
-	private int lineFare;
+	private float lineFare;
 	
-	public LineSchedule(String lineName, int originStationId, String originStationName, String originCity, String originState, String departureDateTime,
-			int destinationStationId, String destinationStationName, String destinationCity, String destinationState, String arrivalDateTime, int lineFare) {
+	public LineSchedule(int lineId, String lineName, int originStationId, String originStationName, String originCity, String originState, String departureDateTime,
+			int destinationStationId, String destinationStationName, String destinationCity, String destinationState, String arrivalDateTime, float lineFare) {
+		this.lineId = lineId;
 		this.lineName = lineName;
 		this.origin = new Station(originStationId, originStationName, originCity, originState);
 		this.departureDateTime = departureDateTime;
@@ -24,6 +26,8 @@ public class LineSchedule {
 	public void addStopList() {
 		// implement
 	}
+
+	public int getLineId() { return lineId; }
 	
 	public String getLineName() { return lineName; }
 	
@@ -35,5 +39,5 @@ public class LineSchedule {
 
 	public String getArrivalDateTime() { return arrivalDateTime; }
 	
-	public int getLineFare() { return lineFare; }	
+	public float getLineFare() { return lineFare; }	
 }
