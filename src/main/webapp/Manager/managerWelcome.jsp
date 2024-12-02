@@ -137,6 +137,42 @@
         .delete-button:hover {
             background-color: #d32f2f;
         }
+        
+        /* Common styles for the form and report section */
+        .sales-report-form {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        .sales-report-form label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .sales-report-form select, .sales-report-form button {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
+        .sales-report-form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .sales-report-form button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -256,7 +292,27 @@
         </select>
         <button type="submit" <% if (role.equals("Manager")) { %> disabled <% } %>>Add Employee</button>
     </form>
+    
+    <!-- Get Sales Report -->
+    <h3>Sales Report</h3>
+    <form method="POST" action="getSalesReport.jsp" class="sales-report-form">
+        <label for="month">Month:</label>
+        <select name="month" id="month" required>
+            <% for (int i = 1; i <= 12; i++) { %>
+                <option value="<%= i %>"><%= new java.text.DateFormatSymbols().getMonths()[i - 1] %></option>
+            <% } %>
+        </select>
+        <label for="year">Year:</label>
+        <select name="year" id="year" required>
+            <%
+                int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+                for (int i = currentYear; i >= currentYear - 10; i--) {
+            %>
+                <option value="<%= i %>"><%= i %></option>
+            <% } %>
+        </select>
+        <button type="submit">Get Sales Report</button>
+    </form>
 </div>
-
 </body>
 </html>

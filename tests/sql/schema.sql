@@ -39,6 +39,7 @@ CREATE TABLE Stop (
     departureDateTime DATETIME,
     arrivalDateTime DATETIME,
     PRIMARY KEY(stopId, stopStation, stopLine),
+    UNIQUE (stopId)
     FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
 );
