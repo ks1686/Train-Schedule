@@ -107,11 +107,6 @@
             background-color: #d32f2f;
         }
 
-        .question-text {
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
         .label-bold {
             font-weight: bold;
         }
