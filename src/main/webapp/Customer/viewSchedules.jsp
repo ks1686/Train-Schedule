@@ -51,8 +51,9 @@
             flex: 6;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            height: 100vh;
             overflow-y: visible;
         }
 
@@ -66,32 +67,6 @@
 		    align-items: center;
         }
 
-        .form-container {
-            margin-top: 20px;
-        }
-
-        .form-container input, .form-container textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }    
-
-        .viewQuestions {
-            padding: 10px 20px;
-            font-size: 14px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .form-container textarea {
-            font-size: 14px;
-        }
-
         .logout-button {
             padding: 8px 16px;
             background-color: #f44336;
@@ -102,16 +77,20 @@
             cursor: pointer;
             text-decoration: none;
         }
-
+        
         .logout-button:hover {
             background-color: #d32f2f;
         }
+        
+        .table-container {
+        	width: 100%;
+            align-items: center;
+            text-align: center;
+        }
                
-
         .reservation-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
         }
 
         .reservation-table th, .employee-table td {
@@ -156,7 +135,7 @@
     String username = (String) session.getAttribute("username");
     String errorMessage = null;
     List<Station> uniqueStations = new ArrayList<>();
-    List<LineSchedule> scheduleRes = new ArrayList<>();
+    Map<Integer, LineSchedule> scheduleRes = new HashMap<>();
     
     String originStationId = request.getParameter("origin");
     String destinationStationId = request.getParameter("destination");
@@ -197,11 +176,14 @@
         ResultSet rs2 = ps2.executeQuery();
         
         while (rs2.next()) {
-        	scheduleRes.add(new LineSchedule(rs2.getInt("LineId"), rs2.getString("LineName"), 
+        	int lineId = rs2.getInt("LineId");
+        	scheduleRes.put(lineId, new LineSchedule(lineId, rs2.getString("LineName"), 
         			rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
         			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), 
         			rs2.getFloat("Fare")));
         }
+        
+        //String query3 = 
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
     } finally {
@@ -257,6 +239,7 @@
 			<button type="submit">View Schedules</button>
 		</form>
 		
+		<div class="table-container">
 		<h3>Book Reservation</h3>
 		<table class="reservation-table">
         <thead>
@@ -272,7 +255,10 @@
             </tr>
         </thead>
         <tbody>
-            <% for (LineSchedule sched : scheduleRes) { %>
+            <%            
+            for (Integer lineId : scheduleRes.keySet()) { 
+            	LineSchedule sched = scheduleRes.get(lineId);
+            %>
                 <tr>
                     <td><%= sched.getLineName() %></td>
                     <td><%= sched.getOrigin() %></td>
@@ -286,8 +272,12 @@
                     </td>
                 </tr>
             <% } %>
-        </tbody>
+        </tbody>      
 	    </table>
+        <% if (scheduleRes.isEmpty()) { %>
+        <p style="color: red">No valid schedules.</p>            
+        <% } %>
+        </div>
     </div>
  
 

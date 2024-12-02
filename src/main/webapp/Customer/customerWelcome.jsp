@@ -51,8 +51,9 @@
             flex: 6;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
+            height: 100vh;
             overflow-y: visible;
         }
 
@@ -64,32 +65,6 @@
 			margin: auto;
 		    justify-content: center;
 		    align-items: center;
-        }
-
-        .form-container {
-            margin-top: 20px;
-        }
-
-        .form-container input, .form-container textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }    
-
-        .viewQuestions {
-            padding: 10px 20px;
-            font-size: 14px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .form-container textarea {
-            font-size: 14px;
         }
 
         .logout-button {
