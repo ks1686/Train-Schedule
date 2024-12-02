@@ -121,7 +121,7 @@
 
 <% 
     if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("../login.jsp");
         return;
     }
     
@@ -134,16 +134,28 @@
 
     String username = (String) session.getAttribute("username");
     String errorMessage = null;
+    
     List<Station> uniqueStations = new ArrayList<>();
     Map<Integer, LineSchedule> scheduleRes = new HashMap<>();
+    List<Integer> keyOrder = new ArrayList<>();
     
-    String originStationId = request.getParameter("origin");
-    String destinationStationId = request.getParameter("destination");
-    String reservationDate = request.getParameter("reservationDate");
+    String originStationId = request.getParameter("originStationId") != null ? request.getParameter("originStationId") : (String) session.getAttribute("originStationId");
+    String destinationStationId = request.getParameter("destinationStationId") != null ? request.getParameter("destinationStationId") : (String) session.getAttribute("destinationStationId");
+    String reservationDate = request.getParameter("reservationDate") != null ? request.getParameter("reservationDate") : (String) session.getAttribute("reservationDate");
+    
+    session.setAttribute("originStationId", originStationId);
+    session.setAttribute("destinationStationId", destinationStationId);
+    session.setAttribute("reservationDate", reservationDate);
+        
+    String departureTimeSort = request.getParameter("departureTimeSort") != null ? request.getParameter("departureTimeSort") : "";
+    String arrivalTimeSort = request.getParameter("arrivalTimeSort") != null ? request.getParameter("arrivalTimeSort") : "";
+    String fareSort = request.getParameter("fareSort") != null ? request.getParameter("fareSort") : "";
+    
+    System.out.println(departureTimeSort + " - " + arrivalTimeSort + " - " + fareSort);
 
     Connection conn = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    PreparedStatement ps1 = null, ps2 = null, ps3 = null;
+    ResultSet rs1 = null, rs2 = null, rs3 = null;
 
     try {
         ApplicationDB appdb = new ApplicationDB();
@@ -152,11 +164,11 @@
         String query = "SELECT DISTINCT s.stationId, s.name, s.city, s.state FROM Stop " + 
                        "JOIN Station s ON Stop.stopStation = s.stationId";
         
-        ps = conn.prepareStatement(query);
-        rs = ps.executeQuery();
+        ps1 = conn.prepareStatement(query);
+        rs1 = ps1.executeQuery();
 
-        while (rs.next()) {        	
-        	uniqueStations.add(new Station(rs.getInt("stationId"), rs.getString("name"),rs.getString("city"), rs.getString("state")));
+        while (rs1.next()) {        	
+        	uniqueStations.add(new Station(rs1.getInt("stationId"), rs1.getString("name"), rs1.getString("city"), rs1.getString("state")));
         }
         // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
         
@@ -169,11 +181,11 @@
 		        		"JOIN Station s2 ON stop2.stopStation = s2.stationId " +
 		        		"WHERE s1.stationId = ? AND s2.stationId = ? AND CAST(stop1.departureDateTime AS DATE) = ? AND stop1.departureDateTime < stop2.arrivalDateTime";
         
-        PreparedStatement ps2 = conn.prepareStatement(query2);
+        ps2 = conn.prepareStatement(query2);
         ps2.setString(1, originStationId);
         ps2.setString(2, destinationStationId);
         ps2.setString(3, reservationDate);
-        ResultSet rs2 = ps2.executeQuery();
+        rs2 = ps2.executeQuery();
         
         while (rs2.next()) {
         	int lineId = rs2.getInt("LineId");
@@ -181,6 +193,7 @@
         			rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
         			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), 
         			rs2.getFloat("Fare")));
+        	keyOrder.add(lineId);
         }
         
         String query3 = "SELECT tl.lineId AS LineId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
@@ -189,8 +202,9 @@
 		        		"JOIN Station s ON stop.stopStation = s.stationId " +
 		        		"ORDER BY stop.departureDateTime ASC";
         
-        PreparedStatement ps3 = conn.prepareStatement(query3);
-        ResultSet rs3 = ps3.executeQuery();
+        
+        ps3 = conn.prepareStatement(query3);
+        rs3 = ps3.executeQuery();
         
         while (rs3.next()) {
         	int lineId = rs3.getInt("LineId");
@@ -198,12 +212,30 @@
         		scheduleRes.get(lineId).addStop(rs3.getInt("StationId"), rs3.getString("StationName"), rs3.getString("StationCity"), rs3.getString("StationState"), rs3.getString("ArrivalDateTime"), rs3.getString("DepartureDateTime"));
         	}
         }
+        
+        if (departureTimeSort.equals("desc")) {
+
+        } else if (departureTimeSort.equals("asc")) {
+        	
+        } else if (arrivalTimeSort.equals("desc")) {
+        	
+        } else if (arrivalTimeSort.equals("asc")) {
+        	
+        } else if (fareSort.equals("desc")) {
+        	
+        } else {
+        	
+        }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
     } finally {
         try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
+            if (rs1 != null) rs1.close();
+            if (ps1 != null) ps1.close();
+            if (rs2 != null) rs2.close();
+            if (ps2 != null) ps2.close();
+            if (rs3 != null) rs3.close();
+            if (ps3 != null) ps3.close();
             if (conn != null) conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -226,7 +258,7 @@
 		<h3>View Alternate Schedules</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">
 			<label>Origin: </label>
-			<select name="origin" required>
+			<select name="originStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"
@@ -237,7 +269,7 @@
 			</select>
 			
 			<label>Destination: </label>
-			<select name="destination" required>
+			<select name="destinationStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"
@@ -260,25 +292,46 @@
             <tr>
                 <th>Transit Line</th>
                 <th>Origin</th>
-                <th>Departure Time</th>
+                <th>Departure Time 
+	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+	                	<input type="hidden" name="departureTimeSort" value="<%= departureTimeSort.equals("asc") ? "desc" : "asc" %>">
+					    <button type="submit">
+					        <%= departureTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+					    </button>
+					</form>
+				</th>
                 <th>Destination</th>
-                <th>Arrival Time</th>
+                <th>Arrival Time 
+	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+	                	<input type="hidden" name="arrivalTimeSort" value="<%= arrivalTimeSort.equals("asc") ? "desc" : "asc" %>">
+					    <button type="submit">
+					        <%= arrivalTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+					    </button>
+					</form>
+				</th>
                 <th>Path</th>
-                <th>Fare</th>
+                <th>Fare 
+	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+	                	<input type="hidden" name="fareSort" value="<%= fareSort.equals("asc") ? "desc" : "asc" %>">
+					    <button type="submit">
+					        <%= fareSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+					    </button>
+					</form>
+                </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <%            
-            for (Integer lineId : scheduleRes.keySet()) { 
+            for (Integer lineId : keyOrder) { 
             	LineSchedule sched = scheduleRes.get(lineId);
             %>
                 <tr>
                     <td><%= sched.getLineName() %></td>
                     <td><%= sched.getOrigin() %></td>
-                    <td><%= sched.getDepartureDateTime() %></td>
+                    <td><%= sched.getFormattedDepartureDateTime() %></td>
                     <td><%= sched.getDestination() %></td>
-                    <td><%= sched.getArrivalDateTime() %></td>
+                    <td><%= sched.getFormattedArrivalDateTime() %></td>
                     <td>
                     	<details>
                     		<summary>View Stops</summary>

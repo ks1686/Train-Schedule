@@ -122,7 +122,7 @@
         rs = ps.executeQuery();
 
         while (rs.next()) {        	
-        	uniqueStations.add(new Station(rs.getInt("stationId"), rs.getString("name"),rs.getString("city"), rs.getString("state")));
+        	uniqueStations.add(new Station(rs.getInt("stationId"), rs.getString("name"), rs.getString("city"), rs.getString("state")));
         }
         // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
     } catch (SQLException e) {
@@ -153,7 +153,7 @@
 		<h3>Book Reservation</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">
 			<label>Origin: </label>
-			<select name="origin" required>
+			<select name="originStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
@@ -161,7 +161,7 @@
 			</select>
 			
 			<label>Destination: </label>
-			<select name="destination" required>
+			<select name="destinationStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
