@@ -151,7 +151,7 @@
     String arrivalTimeSort = request.getParameter("arrivalTimeSort") != null ? request.getParameter("arrivalTimeSort") : "";
     String fareSort = request.getParameter("fareSort") != null ? request.getParameter("fareSort") : "";
     
-    System.out.println(departureTimeSort + " - " + arrivalTimeSort + " - " + fareSort);
+    // System.out.println(departureTimeSort + " - " + arrivalTimeSort + " - " + fareSort);
 
     Connection conn = null;
     PreparedStatement ps1 = null, ps2 = null, ps3 = null;
@@ -396,7 +396,10 @@
                     </td>
                     <td>$<%= String.format("%.02f", sched.getEstimatedFare()) %></td>
                     <td>
-						some action
+		                <form action="makeReservation.jsp" method="POST" style="display: inline">	                	
+		                	<input type="hidden" name="reserve" value="<%= lineId %>">
+						    <button type="submit">Reserve</button>
+						</form>
                     </td>
                 </tr>
             <% } %>
