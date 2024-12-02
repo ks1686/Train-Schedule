@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
-<%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*"%>
+<%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*,java.time.*"%>
 
 <%
     // Set cache control headers to prevent caching of the page
@@ -214,17 +214,35 @@
         }
         
         if (departureTimeSort.equals("desc")) {
-
+        	Collections.sort(keyOrder, (a, b) -> {
+        		LocalDateTime ldtA = scheduleRes.get(a).getDepartureDateTime(), ldtB = scheduleRes.get(b).getDepartureDateTime();
+        		return ldtB.compareTo(ldtA);
+        	});
         } else if (departureTimeSort.equals("asc")) {
-        	
+        	Collections.sort(keyOrder, (a, b) -> {
+        		LocalDateTime ldtA = scheduleRes.get(a).getDepartureDateTime(), ldtB = scheduleRes.get(b).getDepartureDateTime();
+        		return ldtA.compareTo(ldtB);
+        	});
         } else if (arrivalTimeSort.equals("desc")) {
-        	
+        	Collections.sort(keyOrder, (a, b) -> {
+        		LocalDateTime ldtA = scheduleRes.get(a).getArrivalDateTime(), ldtB = scheduleRes.get(b).getArrivalDateTime();
+        		return ldtB.compareTo(ldtA);
+        	});
         } else if (arrivalTimeSort.equals("asc")) {
-        	
+        	Collections.sort(keyOrder, (a, b) -> {
+        		LocalDateTime ldtA = scheduleRes.get(a).getArrivalDateTime(), ldtB = scheduleRes.get(b).getArrivalDateTime();
+        		return ldtA.compareTo(ldtB);
+        	});
         } else if (fareSort.equals("desc")) {
-        	
+        	Collections.sort(keyOrder, (a, b) -> {
+        		float fareA = scheduleRes.get(a).getEstimatedFare(), fareB = scheduleRes.get(b).getEstimatedFare();
+        		return Float.compare(fareB, fareA);
+        	});
         } else {
-        	
+        	Collections.sort(keyOrder, (a, b) -> {
+        		float fareA = scheduleRes.get(a).getEstimatedFare(), fareB = scheduleRes.get(b).getEstimatedFare();
+        		return Float.compare(fareA, fareB);
+        	});
         }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
