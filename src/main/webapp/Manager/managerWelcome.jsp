@@ -178,7 +178,6 @@
 <body>
 
 <% 
-
     if (session == null || session.getAttribute("username") == null) {
         response.sendRedirect("../login.jsp");
         return;
@@ -195,6 +194,8 @@
     PreparedStatement ps = null;
     ResultSet rs = null;
     List<Map<String, String>> employees = new ArrayList<>();
+    String bestCustomer = "";
+    int reservationCount = 0;
     try {
         ApplicationDB db = new ApplicationDB();
         conn = db.getConnection();
@@ -213,6 +214,23 @@
             employee.put("role", rs.getString("role"));
             employees.add(employee);
         }
+        
+        // Get the customer with the most reservations
+        String queryCustomer = "SELECT c.customerId, c.firstName, c.lastName, COUNT(r.reservationNo) AS reservationCount " +
+                               "FROM Customer c " +
+                               "JOIN Reservation r ON c.customerId = r.customerId " +
+                               "GROUP BY c.customerId, c.firstName, c.lastName " +
+                               "ORDER BY reservationCount DESC " +
+                               "LIMIT 1;";
+        
+        ps = conn.prepareStatement(queryCustomer);
+        rs = ps.executeQuery();
+        
+        if (rs.next()) {
+            bestCustomer = rs.getString("firstName") + " " + rs.getString("lastName");
+            reservationCount = rs.getInt("reservationCount");
+        }
+        
     } catch (SQLException e) {
         e.printStackTrace();
     } finally {
@@ -228,6 +246,7 @@
 
 <div class="header">
     <div class="username">Hi, <%= username %>!</div>
+    <div class="customer-info">Top Customer: <%= bestCustomer %> (Reservations: <%= reservationCount %>)</div>
     <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
@@ -290,7 +309,7 @@
         <select name="role" required>
             <option value="Representative">Representative</option>
         </select>
-        <button type="submit" <% if (role.equals("Manager")) { %> disabled <% } %>>Add Employee</button>
+        <button type="submit">Add Employee</button>
     </form>
     
     <!-- Get Sales Report -->
