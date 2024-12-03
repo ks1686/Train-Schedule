@@ -382,6 +382,75 @@
         </select>
         <button type="submit">Generate Report</button>
     </form>
+    
+    <!-- Generate Revenue Report -->
+    <h3>Revenue Report</h3>
+    <form method="POST" action="getRevenue.jsp" class="sales-report-form">
+        <label for="transitLine">Select Transit Line:</label>
+        <select name="transitLine" id="transitLine">
+            <option value="">Select Line</option>
+            <%
+                Connection conn3 = null;
+                PreparedStatement ps3 = null;
+                ResultSet rs3 = null;
+                try {
+                    ApplicationDB db = new ApplicationDB();
+                    conn3 = db.getConnection();
+                    String queryLine = "SELECT DISTINCT lineName FROM TransitLine";
+                    ps3 = conn3.prepareStatement(queryLine);
+                    rs3 = ps3.executeQuery();
+    
+                    while (rs3.next()) {
+                        String lineName = rs3.getString("lineName");
+                        out.println("<option value='" + lineName + "'>" + lineName + "</option>");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs1 != null) rs3.close();
+                        if (ps1 != null) ps3.close();
+                        if (conn1 != null) conn3.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        </select>
+    
+        <label for="customerName">Select Customer:</label>
+        <select name="customerName" id="customerName">
+            <option value="">Select Customer</option>
+            <%
+                Connection conn4 = null;
+                PreparedStatement ps4 = null;
+                ResultSet rs4 = null;
+                try {
+                    ApplicationDB db = new ApplicationDB();
+                    conn4 = db.getConnection();
+                    String queryCustomer = "SELECT DISTINCT firstName, lastName FROM Customer";
+                    ps4 = conn4.prepareStatement(queryCustomer);
+                    rs4 = ps4.executeQuery();
+    
+                    while (rs4.next()) {
+                        String customerName = rs4.getString("firstName") + " " + rs4.getString("lastName");
+                        out.println("<option value='" + customerName + "'>" + customerName + "</option>");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs4 != null) rs4.close();
+                        if (ps4 != null) ps4.close();
+                        if (conn4 != null) conn4.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        </select>
+        <button type="submit">Generate Revenue Report</button>
+    </form>
 </div>
 </body>
 </html>
