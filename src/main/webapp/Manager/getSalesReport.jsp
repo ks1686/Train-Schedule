@@ -48,6 +48,7 @@
         margin-top: 20px;
         color: #333;
     }
+
     .compact-button {
         padding: 6px 12px;
         border-radius: 4px;
@@ -58,8 +59,6 @@
         color: white;
         display: inline-block;
         margin: 10px 0;
-        display: inline-block;
-        margin: 10px 0; 
     }
 
     .compact-button:hover {
@@ -77,13 +76,14 @@
         width: 100%;
     }
 </style>
+
 <%
     // Check if the session is valid and the user is a manager
     if (session == null || session.getAttribute("username") == null) {
         response.sendRedirect("../login.jsp");
         return;
     }
-    
+
     if (!"Manager".equals(session.getAttribute("role"))) {
         response.sendRedirect("../403.jsp");
         return;
@@ -92,7 +92,6 @@
     String month = request.getParameter("month");
     String year = request.getParameter("year");
 
-    // Check if the month and year are provided
     if (month == null || year == null) {
         out.println("<p>Error: Please provide the month and year to generate the sales report.</p>");
         return;
@@ -124,6 +123,7 @@
         out.println("<html>");
         out.println("<head><title>Sales Report</title></head>");
         out.println("<body>");
+        out.println("<div class='header'>Sales Report</div>");
         out.println("<h2>Sales Report for " + new java.text.DateFormatSymbols().getMonths()[Integer.parseInt(month) - 1] + " " + year + "</h2>");
         out.println("<table border='1'>");
         out.println("<thead>");
