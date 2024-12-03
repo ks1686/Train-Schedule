@@ -312,6 +312,53 @@
         <button type="submit">Add Employee</button>
     </form>
     
+    <!-- Top 5 Transit Lines -->
+    <h3>Top 5 Transit Lines</h3>
+    <table class="employee-table">
+        <thead>
+            <tr>
+                <th>Transit Line</th>
+                <th>Reservations</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+                Connection conn5 = null;
+                PreparedStatement ps5 = null;
+                ResultSet rs5 = null;
+                try {
+                    ApplicationDB db = new ApplicationDB();
+                    conn5 = db.getConnection();
+                    String queryTopLines = "SELECT t.lineName, COUNT(r.reservationNo) AS reservationCount " +
+                                           "FROM Reservation r " +
+                                           "JOIN TransitLine t ON r.transitLineId = t.lineId " +
+                                           "GROUP BY t.lineName " +
+                                           "ORDER BY reservationCount DESC " +
+                                           "LIMIT 5";
+                    ps5 = conn5.prepareStatement(queryTopLines);
+                    rs5 = ps5.executeQuery();
+    
+                    while (rs5.next()) {
+                        String lineName = rs5.getString("lineName");
+                        int topresCount = rs5.getInt("reservationCount");
+                        out.println("<tr><td>" + lineName + "</td><td>" + topresCount + "</td></tr>");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs5 != null) rs5.close();
+                        if (ps5 != null) ps5.close();
+                        if (conn5 != null) conn5.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        </tbody>
+    </table>
+    
+    
     <!-- Get Sales Report -->
     <h3>Sales Report</h3>
     <form method="POST" action="getSalesReport.jsp" class="sales-report-form">

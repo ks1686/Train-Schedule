@@ -79,7 +79,7 @@ CREATE TABLE `Reservation` (
   CONSTRAINT `reservation_ibfk_2` FOREIGN KEY (`transitLineId`) REFERENCES `TransitLine` (`lineId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reservation_ibfk_3` FOREIGN KEY (`originStationId`) REFERENCES `Station` (`stationId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `reservation_ibfk_4` FOREIGN KEY (`destinationStationId`) REFERENCES `Station` (`stationId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE `RViews` (
   `reservationNo` int NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE `TransitLine` (
   KEY `destination` (`destination`),
   CONSTRAINT `transitline_ibfk_1` FOREIGN KEY (`origin`) REFERENCES `Station` (`stationId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `transitline_ibfk_2` FOREIGN KEY (`destination`) REFERENCES `Station` (`stationId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 INSERT INTO `Customer` (`customerId`, `firstName`, `lastName`, `username`, `password`, `email`) VALUES
 (1, 'John', 'Doe', 'user1', 'password1', 'john@aol.com'),
@@ -163,7 +163,8 @@ INSERT INTO `Reservation` (`reservationNo`, `customerId`, `transitLineId`, `orig
 (5, 1, 1, 1, 16, '2024-11-15 14:30:00', 0),
 (6, 2, 1, 5, 14, '2024-11-20 18:15:00', 1),
 (7, 1, 1, 3, 12, '2024-01-05 10:00:00', 0),
-(8, 2, 1, 7, 15, '2024-01-10 15:45:00', 1);
+(8, 2, 1, 7, 15, '2024-01-10 15:45:00', 1),
+(9, 2, 2, 7, 1, '2024-01-10 15:45:00', 1);
 
 INSERT INTO `Station` (`stationId`, `name`, `city`, `state`) VALUES
 (1, 'Trenton Transit Center', 'Trenton', 'NJ'),
@@ -201,4 +202,5 @@ INSERT INTO `Stop` (`stopId`, `stopStation`, `stopLine`, `departureDateTime`, `a
 (15, 16, 1, '2024-12-10 09:06:00', '2024-12-10 09:06:00');
 
 INSERT INTO `TransitLine` (`lineId`, `lineName`, `origin`, `destination`, `departureDateTime`, `arrivalDateTime`, `fare`) VALUES
-(1, 'NJ Northeast Corridor', 1, 16, '2024-12-10 07:23:00', '2024-12-10 09:06:00', 100);
+(1, 'NJ Northeast Corridor', 1, 16, '2024-12-10 07:23:00', '2024-12-10 09:06:00', 100),
+(2, 'NJ South Corridor', 16, 1, '2024-12-10 09:23:00', '2024-12-10 11:06:00', 150);
