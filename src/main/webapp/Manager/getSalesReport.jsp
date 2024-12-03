@@ -2,6 +2,7 @@
 <%@ page import="com.cs336.pkg.*"%>
 
 <style>
+<<<<<<< HEAD
     /* CSS from managerWelcome.jsp */
     body {
         font-family: Arial, sans-serif;
@@ -50,6 +51,8 @@
         color: #333;
     }
 
+=======
+>>>>>>> 3967ddb8dd92e0ee7951e86434f3eeb983ecec8b
     .compact-button {
         padding: 6px 12px;
         border-radius: 4px;
@@ -58,13 +61,19 @@
         border: none;
         background-color: #4CAF50;
         color: white;
+<<<<<<< HEAD
         display: inline-block;
         margin: 10px 0;
+=======
+        display: inline-block; /* Make the button only as wide as the content */
+        margin: 10px 0; /* Add margin for spacing */
+>>>>>>> 3967ddb8dd92e0ee7951e86434f3eeb983ecec8b
     }
 
     .compact-button:hover {
         background-color: #45a049;
     }
+<<<<<<< HEAD
 
     .footer {
         text-align: center;
@@ -79,6 +88,10 @@
 </style>
 
 
+=======
+</style>
+
+>>>>>>> 3967ddb8dd92e0ee7951e86434f3eeb983ecec8b
 <%
     // Check if the session is valid and the user is a manager
     if (session == null || session.getAttribute("username") == null) {
