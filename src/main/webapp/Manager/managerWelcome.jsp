@@ -313,6 +313,75 @@
         </select>
         <button type="submit">Get Sales Report</button>
     </form>
+    
+    <!-- Generate Reservations Report -->
+    <h3>Reservations Report</h3>
+    <form method="POST" action="getReservations.jsp" class="sales-report-form">
+        <label for="transitLine">Select Transit Line:</label>
+        <select name="transitLine" id="transitLine">
+            <option value="">Select Line</option>
+            <%
+                Connection conn1 = null;
+                PreparedStatement ps1 = null;
+                ResultSet rs1 = null;
+                try {
+                    ApplicationDB db = new ApplicationDB();
+                    conn1 = db.getConnection();
+                    String queryLine = "SELECT DISTINCT lineName FROM TransitLine";
+                    ps1 = conn1.prepareStatement(queryLine);
+                    rs1 = ps1.executeQuery();
+                    
+                    while (rs1.next()) {
+                        String lineName = rs1.getString("lineName");
+                        out.println("<option value='" + lineName + "'>" + lineName + "</option>");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs1 != null) rs1.close();
+                        if (ps1 != null) ps1.close();
+                        if (conn1 != null) conn1.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        </select>
+    
+        <label for="customerName">Select Customer:</label>
+        <select name="customerName" id="customerName">
+            <option value="">Select Customer</option>
+            <%
+                Connection conn2 = null;
+                PreparedStatement ps2 = null;
+                ResultSet rs2 = null;
+                try {
+                    ApplicationDB db = new ApplicationDB();
+                    conn2 = db.getConnection();
+                    String queryCustomer = "SELECT DISTINCT firstName, lastName FROM Customer";
+                    ps2 = conn2.prepareStatement(queryCustomer);
+                    rs2 = ps2.executeQuery();
+                    
+                    while (rs2.next()) {
+                        String customerName = rs2.getString("firstName") + " " + rs2.getString("lastName");
+                        out.println("<option value='" + customerName + "'>" + customerName + "</option>");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (rs2 != null) rs2.close();
+                        if (ps2 != null) ps2.close();
+                        if (conn2 != null) conn2.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            %>
+        </select>
+        <button type="submit">Generate Report</button>
+    </form>
 </div>
 </body>
 </html>
