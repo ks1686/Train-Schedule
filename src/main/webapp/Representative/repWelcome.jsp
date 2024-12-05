@@ -515,13 +515,47 @@
             <p>Schedule:</p>
         </div>
         
-		<!-- Search Form -->
-	    <div class="search-container">
-	        <form method="GET" action="repWelcome.jsp">
-	            <input type="text" name="station" placeholder="Search by station" required>
-	            <input type="submit" value="Search" />
-	        </form>
-	    </div>
+        <!-- Search Form -->
+        <div class="search-container">
+            <form method="GET" action="repWelcome.jsp">
+                <label for="station">Select Station:</label>
+                <select name="station" id="station" required>
+                    <%
+                        Connection conn1 = null;
+                        PreparedStatement ps1 = null;
+                        ResultSet rs1 = null;
+                    
+                    
+                        // Get all stations and display them in the dropdown
+                        try {
+                            ApplicationDB appdb1 = new ApplicationDB();
+                            conn1 = appdb1.getConnection();
+                            ps1 = conn1.prepareStatement("SELECT * FROM Station");
+                            rs1 = ps1.executeQuery();
+                            
+                            while (rs1.next()) {
+                                String stationName = rs1.getString("name");
+                    %>        
+                            <option value="<%= stationName %>"><%= stationName %></option>
+                    <%
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (rs1 != null) rs1.close();
+                                if (ps1 != null) ps1.close();
+                                if (conn1 != null) conn1.close();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    %>
+                </select>
+                <input type="submit" value="Search" />
+            </form>
+        </div>
+
 
 	    <!-- Train Schedules Table -->
 	    <table>
