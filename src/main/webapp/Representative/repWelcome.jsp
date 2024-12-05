@@ -604,13 +604,21 @@
                                     <!-- Edit Form -->
                                     <form method="POST" action="repWelcome.jsp">
                                         <input type="hidden" name="editLineId" value="<%= lineId %>">
-                                        <input type="submit" value="Edit" />
+                                        <input type="submit" value="Edit" class="edit-button">
                                     </form>
                                     
                                     <!-- Delete Form -->
                                     <form method="POST" action="deleteSchedule.jsp">
                                         <input type="hidden" name="lineId" value="<%= lineId %>" />
-                                        <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this schedule?');" />
+                                        <input type="submit" value="Delete" class="delete-button" onclick="return confirm('Are you sure you want to delete this schedule?');" />
+                                    </form>
+                                    
+                                    <!-- View Form -->
+                                    <form method="GET" action="viewStops.jsp">
+                                        <input type="hidden" name="lineId" value="<%= lineId %>">
+                                        <input type="hidden" name="origin" value="<%= origin %>">
+                                        <input type="hidden" name="destination" value="<%= destination %>">
+                                        <input type="submit" value="View" class="view-button">
                                     </form>
                                 </td>
                             </tr>
