@@ -65,7 +65,7 @@ public class LineSchedule {
 	
 	public String getLineName() { return lineName; }
 	
-	public String getOrigin() { return origin.toString(); }
+	public Station getOrigin() { return origin; }
 
 	public LocalDateTime getDepartureDateTime() { return departureDateTime; }
 	
@@ -73,7 +73,7 @@ public class LineSchedule {
 	
 	public int getOriginIndex() { return originIndex; }
 
-	public String getDestination() { return destination.toString(); }
+	public Station getDestination() { return destination; }
 
 	public LocalDateTime getArrivalDateTime() { return arrivalDateTime; }
 	

@@ -172,6 +172,8 @@
         }
         // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
         
+        
+        // Get all transit lines that are operating on the user's provided stations and date
         String query2 = "SELECT tl.lineId AS LineId, tl.lineName AS LineName, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
         				"s2.stationId AS DestinationStationId, s2.name AS DestinationStationName, s2.city AS DestinationCity, s2.state AS DestinationState, stop2.arrivalDateTime AS ArrivalDateTime, tl.fare AS Fare " +
 		        		"FROM Station s1 " +
@@ -196,12 +198,12 @@
         	keyOrder.add(lineId);
         }
         
+        
+        // Get all stops on a transit line and their respective station
         String query3 = "SELECT tl.lineId AS LineId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
 		        		"FROM TransitLine tl " +
 		        		"JOIN Stop stop ON tl.lineId = stop.stopLine " +
-		        		"JOIN Station s ON stop.stopStation = s.stationId " +
-		        		"ORDER BY stop.departureDateTime ASC";
-        
+		        		"JOIN Station s ON stop.stopStation = s.stationId";
         
         ps3 = conn.prepareStatement(query3);
         rs3 = ps3.executeQuery();
@@ -276,7 +278,7 @@
 		<h3>View Alternate Schedules</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">
 			<label>Origin: </label>
-			<select name="originStationId" required>
+			<select name="originStationId" required <%= session.getAttribute("reserving") != null ? "disabled" : ""%>>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"
@@ -287,7 +289,7 @@
 			</select>
 			
 			<label>Destination: </label>
-			<select name="destinationStationId" required>
+			<select name="destinationStationId" required <%= session.getAttribute("reserving") != null ? "disabled" : ""%>>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"
@@ -343,12 +345,13 @@
             <%            
             for (Integer lineId : keyOrder) { 
             	LineSchedule sched = scheduleRes.get(lineId);
+            	session.setAttribute("line: " + lineId, sched);
             %>
                 <tr>
                     <td><%= sched.getLineName() %></td>
-                    <td><%= sched.getOrigin() %></td>
+                    <td><%= sched.getOrigin().toString() %></td>
                     <td><%= sched.getFormattedDepartureDateTime() %></td>
-                    <td><%= sched.getDestination() %></td>
+                    <td><%= sched.getDestination().toString() %></td>
                     <td><%= sched.getFormattedArrivalDateTime() %></td>
                     <td>
                     	<details>
@@ -396,7 +399,7 @@
                     </td>
                     <td>$<%= String.format("%.02f", sched.getEstimatedFare()) %></td>
                     <td>
-		                <form action="makeReservation.jsp" method="POST" style="display: inline">	                	
+		                <form action="confirmReservation.jsp" method="POST" style="display: inline">	                	
 		                	<input type="hidden" name="reserve" value="<%= lineId %>">
 						    <button type="submit">Reserve</button>
 						</form>
@@ -406,7 +409,7 @@
         </tbody>      
 	    </table>
         <% if (scheduleRes.isEmpty()) { %>
-        <p style="color: red">No valid schedules.</p>            
+        	<p style="color: red">No valid schedules.</p>            
         <% } %>
         </div>
     </div>
