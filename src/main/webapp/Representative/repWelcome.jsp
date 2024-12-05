@@ -446,11 +446,45 @@
             <p>Customer List By Transit and Date:</p>
         </div>
 		<div class="search-container">
-	        <form method="GET" action="repWelcome.jsp">
-	            <input type="text" name="lineName" placeholder="Search by Transit Line Name" required>	            
-	            <input type="date" name="reservationDate" required>
-	            <input type="submit" value="Search for Customers" />
-	        </form>
+		                <form method="GET" action="repWelcome.jsp">
+                <label for="lineName">Select Transit Line:</label>
+                <select name="lineName" id="lineName" required>
+                    <%
+                        Connection conn2 = null;
+                        PreparedStatement ps2 = null;
+                        ResultSet rs2 = null;
+                    
+                    
+                        // Get all transit lines and display them in the dropdown
+                        try {
+                            ApplicationDB appdb2 = new ApplicationDB();
+                            conn2 = appdb2.getConnection();
+                            ps2 = conn2.prepareStatement("SELECT * FROM TransitLine");
+                            rs2 = ps2.executeQuery();
+                            
+                            while (rs2.next()) {
+                                String lineName = rs2.getString("lineName");
+                    %>        
+                            <option value="<%= lineName %>"><%= lineName %></option>
+                    <%
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (rs2 != null) rs2.close();
+                                if (ps2 != null) ps2.close();
+                                if (conn2 != null) conn2.close();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    %>
+                </select>
+                <label for="reservationDate">Select Date:</label>
+                <input type="date" name="reservationDate" id="reservationDate" required />
+                <input type="submit" value="Search" />
+            </form>
     	</div>
 		<table>
             <thead>
@@ -515,13 +549,47 @@
             <p>Schedule:</p>
         </div>
         
-		<!-- Search Form -->
-	    <div class="search-container">
-	        <form method="GET" action="repWelcome.jsp">
-	            <input type="text" name="station" placeholder="Search by station" required>
-	            <input type="submit" value="Search" />
-	        </form>
-	    </div>
+        <!-- Search Form -->
+        <div class="search-container">
+            <form method="GET" action="repWelcome.jsp">
+                <label for="station">Select Station:</label>
+                <select name="station" id="station" required>
+                    <%
+                        Connection conn1 = null;
+                        PreparedStatement ps1 = null;
+                        ResultSet rs1 = null;
+                    
+                    
+                        // Get all stations and display them in the dropdown
+                        try {
+                            ApplicationDB appdb1 = new ApplicationDB();
+                            conn1 = appdb1.getConnection();
+                            ps1 = conn1.prepareStatement("SELECT * FROM Station");
+                            rs1 = ps1.executeQuery();
+                            
+                            while (rs1.next()) {
+                                String stationName = rs1.getString("name");
+                    %>        
+                            <option value="<%= stationName %>"><%= stationName %></option>
+                    <%
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (rs1 != null) rs1.close();
+                                if (ps1 != null) ps1.close();
+                                if (conn1 != null) conn1.close();
+                            } catch (SQLException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    %>
+                </select>
+                <input type="submit" value="Search" />
+            </form>
+        </div>
+
 
 	    <!-- Train Schedules Table -->
 	    <table>
