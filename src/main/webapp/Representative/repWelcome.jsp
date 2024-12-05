@@ -243,7 +243,7 @@
             color: white;
         }
 
-        .edit-button, .delete-button, .save-button {
+        .edit-button, .delete-button, .save-button, .view-button {
             padding: 6px 12px;
             border: none;
             cursor: pointer;
@@ -264,17 +264,22 @@
             color: white;
         }
         
+        .view-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
                
     </style>
 </head>
 <body>
 
-<% 
+<%
     if (session == null || session.getAttribute("username") == null) {
         response.sendRedirect("../login.jsp");
         return;
     }
-    
+
     String role = (String) session.getAttribute("role");
     if (!role.equals("Representative")) {
         response.sendRedirect("../403.jsp");
@@ -293,8 +298,7 @@
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
-    
-    
+
     try {
         ApplicationDB appdb = new ApplicationDB();
         conn = appdb.getConnection();
@@ -334,7 +338,7 @@
                 ps3.setInt(1, Integer.parseInt(replyQuestionId));
                 ps3.setString(2, username);
                 ResultSet rsCheck = ps3.executeQuery();
-                
+
                 if (rsCheck.next()) {
                     String updateQuery = "UPDATE Answers SET answerText = ? WHERE questionId = ? AND employeeSSN = (SELECT ssn FROM Employee WHERE username = ?)";
                     ps3 = conn.prepareStatement(updateQuery);
@@ -371,69 +375,6 @@
         }
     }
 %>
-
-
-<script>
-    function editRow(lineId) {
-        var row = document.getElementById("row-" + lineId);
-        var lineName = document.getElementById("lineName-" + lineId);
-        var origin = document.getElementById("origin-" + lineId);
-        var destination = document.getElementById("destination-" + lineId);
-        var departure = document.getElementById("departure-" + lineId);
-        var arrival = document.getElementById("arrival-" + lineId);
-        var fare = document.getElementById("fare-" + lineId);
-
-        lineName.innerHTML = "<input type='text' id='lineNameInput' value='" + lineName.innerText + "'>";
-        origin.innerHTML = "<input type='text' id='originInput' value='" + origin.innerText + "'>";
-        destination.innerHTML = "<input type='text' id='destinationInput' value='" + destination.innerText + "'>";
-        departure.innerHTML = "<input type='text' id='departureInput' value='" + departure.innerText + "'>";
-        arrival.innerHTML = "<input type='text' id='arrivalInput' value='" + arrival.innerText + "'>";
-        fare.innerHTML = "<input type='text' id='fareInput' value='" + fare.innerText + "'>";
-
-        var saveButton = document.createElement("button");
-        saveButton.innerHTML = "Save";
-        saveButton.classList.add("save-button");
-        saveButton.onclick = function() { saveRow(lineId); };
-        var actionsCell = row.querySelector('td:last-child');
-        actionsCell.innerHTML = '';
-        actionsCell.appendChild(saveButton);
-    }
-
-    function saveRow(lineId) {
-        var lineName = document.getElementById("lineNameInput").value;
-        var origin = document.getElementById("originInput").value;
-        var destination = document.getElementById("destinationInput").value;
-        var departure = document.getElementById("departureInput").value;
-        var arrival = document.getElementById("arrivalInput").value;
-        var fare = document.getElementById("fareInput").value;
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "updateSchedule.jsp", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                location.reload();
-            }
-        };
-        xhr.send("lineId=" + lineId + "&lineName=" + lineName + "&origin=" + origin + "&destination=" + destination +
-                  "&departure=" + departure + "&arrival=" + arrival + "&fare=" + fare);
-    }
-
-    function deleteRow(lineId) {
-        if (confirm("Are you sure you want to delete this schedule?")) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "deleteSchedule.jsp", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    var row = document.getElementById("row-" + lineId);
-                    row.parentNode.removeChild(row);
-                }
-            };
-            xhr.send("lineId=" + lineId);
-        }
-    }
-</script>
 
 <div class="header">
     <span class="username">Hello, <%= username %></span>
@@ -497,9 +438,14 @@
             </thead>
             <tbody>
                 <%
+                
+                Connection conn3 = null;
+                PreparedStatement ps3 = null;
+                ResultSet rs3 = null;
+                
                 try {
-                    ApplicationDB appdb = new ApplicationDB();
-                    conn = appdb.getConnection();
+                    ApplicationDB appdb3 = new ApplicationDB();
+                    conn3 = appdb3.getConnection();
                     
                     String lineName = request.getParameter("lineName");
                     String date = request.getParameter("reservationDate");
@@ -510,17 +456,17 @@
                                    "JOIN Customer c ON r.customerId = c.customerId " +
                                    "WHERE tl.lineName = ? AND DATE(r.reservationDateTime) = ?";
                     
-                    ps = conn.prepareStatement(query);
-                    ps.setString(1, lineName);
-                    ps.setString(2, date);
+                    ps3 = conn3.prepareStatement(query);
+                    ps3.setString(1, lineName);
+                    ps3.setString(2, date);
 
-                    rs = ps.executeQuery();
+                    rs3 = ps3.executeQuery();
 
-                    while (rs.next()) {
-                        String cUsername = rs.getString("username");
-                        String firstName = rs.getString("firstName");
-                        String lastName = rs.getString("lastName");
-                        String email = rs.getString("email");
+                    while (rs3.next()) {
+                        String cUsername = rs3.getString("username");
+                        String firstName = rs3.getString("firstName");
+                        String lastName = rs3.getString("lastName");
+                        String email = rs3.getString("email");
             %>
                         <tr>
                             <td><%= cUsername %></td>
@@ -534,9 +480,9 @@
                     e.printStackTrace();
                 } finally {
                     try {
-                        if (rs != null) rs.close();
-                        if (ps != null) ps.close();
-                        if (conn != null) conn.close();
+                        if (rs3 != null) rs3.close();
+                        if (ps3 != null) ps3.close();
+                        if (conn3 != null) conn3.close();
                     } catch (SQLException ex) {
                         ex.printStackTrace();
                     }
@@ -592,81 +538,128 @@
 
 
 	    <!-- Train Schedules Table -->
-	    <table>
-	        <thead>
-	            <tr>
-	                <th>Line Name</th>
-	                <th>Origin</th>
-	                <th>Destination</th>
-	                <th>Departure</th>
-	                <th>Arrival</th>
-	                <th>Fare</th>
-	                <th>Actions</th>
-	            </tr>
-	        </thead>
-	        <tbody>
-	            <%
-		            try {    
-		                ApplicationDB appdb = new ApplicationDB();
-		                conn = appdb.getConnection();
-		                
-		                String searchStation = request.getParameter("station");
-		                String query = 
-		                    "SELECT TL.lineName, S1.name AS Origin, S2.name AS Destination, " +
-		                    "TL.departureDateTime, TL.arrivalDateTime, TL.fare, TL.lineId " +
-		                    "FROM TransitLine TL " +
-		                    "JOIN Station S1 ON TL.origin = S1.stationId " +
-		                    "JOIN Station S2 ON TL.destination = S2.stationId ";
+        <table>
+            <thead>
+                <tr>
+                    <th>Line Name</th>
+                    <th>Origin</th>
+                    <th>Destination</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                    <th>Fare</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%
+                    Connection conn4 = null;
+                    PreparedStatement ps4 = null;
+                    ResultSet rs4 = null;
+        
+                    try {    
+                        ApplicationDB appdb4 = new ApplicationDB();
+                        conn4 = appdb4.getConnection();
+                        
+                        String searchStation = request.getParameter("station");
+                        String query = 
+                            "SELECT TL.lineName, S1.name AS Origin, S2.name AS Destination, " +
+                            "TL.departureDateTime, TL.arrivalDateTime, TL.fare, TL.lineId " +
+                            "FROM TransitLine TL " +
+                            "JOIN Station S1 ON TL.origin = S1.stationId " +
+                            "JOIN Station S2 ON TL.destination = S2.stationId ";
+        
+                        if (searchStation != null && !searchStation.trim().isEmpty()) {
+                            query += "WHERE S1.name LIKE ? OR S2.name LIKE ?";
+                        }
+        
+                        ps4 = conn4.prepareStatement(query);
+        
+                        if (searchStation != null && !searchStation.trim().isEmpty()) {
+                            String searchPattern = "%" + searchStation + "%";
+                            ps4.setString(1, searchPattern);
+                            ps4.setString(2, searchPattern);
+                        }
+        
+                        rs4 = ps4.executeQuery();
+        
+                        while (rs4.next()) {
+                            String lineName = rs4.getString("lineName");
+                            String origin = rs4.getString("Origin");
+                            String destination = rs4.getString("Destination");
+                            String departure = rs4.getString("departureDateTime");
+                            String arrival = rs4.getString("arrivalDateTime");
+                            float fare = rs4.getFloat("fare");
+                            int lineId = rs4.getInt("lineId");
+        
+                            // Display the train schedules
+                %>
+                            <tr id="row-<%= lineId %>">
+                                <td><%= lineName %></td>
+                                <td><%= origin %></td>
+                                <td><%= destination %></td>
+                                <td><%= departure %></td>
+                                <td><%= arrival %></td>
+                                <td><%= fare %></td>
+                                <td>
+                                    <!-- Edit Form -->
+                                    <form method="POST" action="repWelcome.jsp">
+                                        <input type="hidden" name="editLineId" value="<%= lineId %>">
+                                        <input type="submit" value="Edit" />
+                                    </form>
+                                    
+                                    <!-- Delete Form -->
+                                    <form method="POST" action="deleteSchedule.jsp">
+                                        <input type="hidden" name="lineId" value="<%= lineId %>" />
+                                        <input type="submit" value="Delete" onclick="return confirm('Are you sure you want to delete this schedule?');" />
+                                    </form>
+                                </td>
+                            </tr>
+        
+                            <!-- Conditional Edit Form Display -->
+                            <% if (request.getParameter("editLineId") != null && Integer.parseInt(request.getParameter("editLineId")) == lineId) { %>
+                                <tr>
+                                    <td colspan="7">
+                                        <form method="POST" action="updateSchedule.jsp">
+                                            <input type="hidden" name="lineId" value="<%= lineId %>">
+                                            
+                                            <!-- Update Line Name -->
+                                            <label for="lineName-<%= lineId %>">Line Name:</label>
+                                            <input type="text" name="lineName" id="lineName-<%= lineId %>" value="<%= lineName %>"><br>
+                                            
+                                            <!-- Update Origin -->
+                                            <label for="origin-<%= lineId %>">Origin:</label>
+                                            <input type="text" name="origin" id="origin-<%= lineId %>" value="<%= origin %>"><br>
 
-		                if (searchStation != null && !searchStation.trim().isEmpty()) {
-		                    query += "WHERE S1.name LIKE ? OR S2.name LIKE ?";
-		                }
-
-		                ps = conn.prepareStatement(query);
-
-		                if (searchStation != null && !searchStation.trim().isEmpty()) {
-		                    String searchPattern = "%" + searchStation + "%";
-		                    ps.setString(1, searchPattern);
-		                    ps.setString(2, searchPattern);
-		                }
-	
-		                rs = ps.executeQuery();
-	
-		                while (rs.next()) {
-		                    String lineName = rs.getString("lineName");
-		                    String origin = rs.getString("Origin");
-		                    String destination = rs.getString("Destination");
-		                    String departure = rs.getString("departureDateTime");
-		                    String arrival = rs.getString("arrivalDateTime");
-		                    float fare = rs.getFloat("fare");
-		                    int lineId = rs.getInt("lineId");
-	
-		                    // Display the train schedules
-		                    %>
-		                    <tr id="row-<%= lineId %>">
-		                        <td><span id="lineName-<%= lineId %>"><%= lineName %></span></td>
-		                        <td><span id="origin-<%= lineId %>"><%= origin %></span></td>
-		                        <td><span id="destination-<%= lineId %>"><%= destination %></span></td>
-		                        <td><span id="departure-<%= lineId %>"><%= departure %></span></td>
-		                        <td><span id="arrival-<%= lineId %>"><%= arrival %></span></td>
-		                        <td><span id="fare-<%= lineId %>"><%= fare %></span></td>
-		                        <td>
-		                            <button class="edit-button" onclick="editRow(<%= lineId %>)">Edit</button>
-		                            <button class="delete-button" onclick="deleteRow(<%= lineId %>)">Delete</button>
-		                        </td>
-		                    </tr>
-		                    <%
-		                }
-		            } catch (Exception e) {
-		                e.printStackTrace();
-		            } finally {
-		                if (rs != null) rs.close();
-		                if (ps != null) ps.close();
-		                if (conn != null) conn.close();
-		            }
-	            %>
-	        </tbody>
-	    </table>
+                                            <!-- Update Destination --> 
+                                            <label for="destination-<%= lineId %>">Destination:</label>
+                                            <input type="text" name="destination" id="destination-<%= lineId %>" value="<%= destination %>"><br>
+                                            
+                                            <label for="departure-<%= lineId %>">Departure:</label>
+                                            <input type="datetime-local" name="departure" id="departure-<%= lineId %>" value="<%= departure %>"><br>
+                                            
+                                            <label for="arrival-<%= lineId %>">Arrival:</label>
+                                            <input type="datetime-local" name="arrival" id="arrival-<%= lineId %>" value="<%= arrival %>"><br>
+                                            
+                                            <label for="fare-<%= lineId %>">Fare:</label>
+                                            <input type="number" step="0.01" name="fare" id="fare-<%= lineId %>" value="<%= fare %>"><br>
+                                            
+                                            <input type="submit" value="Update">
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% } %>
+                <%
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (rs4 != null) try { rs4.close(); } catch (SQLException e) {}
+                        if (ps4 != null) try { ps4.close(); } catch (SQLException e) {}
+                        if (conn4 != null) try { conn4.close(); } catch (SQLException e) {}
+                    }
+                %>
+            </tbody>
+        </table>
 	</div>
     <div class="bottom-half">
         <% if (errorMessage != null) { %>
