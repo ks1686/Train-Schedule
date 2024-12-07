@@ -267,7 +267,7 @@
 			
 			<input type="hidden" name="destinationStationId" value="<%= sched.getOrigin().getStationId() %>">
 			
-			<input type="hidden" name="arrivalTime" value="<%= reservation.get(0).getArrivalDateTime().toLocalTime() %>"> <!-- TODO: return must be after arrival time in viewschedules -->
+			<input type="hidden" name="earliestReturnTime" value="<%= reservation.get(0).getArrivalDateTime().toLocalTime() %>"> <!-- TODO: return must be after arrival time in viewschedules -->
 			
 			<label>Date of Return: </label>	            
 	        <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>" min="<%= reservation.get(0).getArrivalDateTime().toLocalDate() %>">
