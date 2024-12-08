@@ -343,7 +343,6 @@
 								<th>Destination</th>
 								<th>Time</th>
 								<th>Cost</th>
-								<th></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -381,12 +380,6 @@
 		 								<b>Discount <span style="color:green">(-<%= reservation.getDiscountRate() %>%)</span>:</b> <%= String.format("-$%.2f", reservation.getCustomerDiscount()) %> <br>
 		 								<b>Final Cost: <%= String.format("$%.2f", reservation.getCustomerFare()) %></b>
 		 							</td>
-				                    <td>
-						                <form action="cancelReservation.jsp" method="POST" style="display:inline">	                	
-						                	<input type="hidden" name="cancel" value="<%= reservation.getReservationNo() %>">
-										    <button type="submit">Cancel</button>
-										</form>
-				                    </td>
 								</tr>
 							<% } %>
 						</tbody>
