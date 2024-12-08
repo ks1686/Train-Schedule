@@ -258,12 +258,142 @@
 		
 		<!--  view reservations  -->
 		<h3>Upcoming Reservations</h3>
+
 		<div class="reservation-container">
-			
+			<% if (currentReservations.isEmpty()) { %> 
+				<p>No upcoming reservations.</p>
+			<% } else { %>
+				<table>
+					<thead>
+						<tr>
+							<th>Reservation</th>
+							<th>Passenger</th>
+							<th>Transit Line</th>
+							<th>Origin</th>
+							<th>Time</th>
+							<th>Destination</th>
+							<th>Time</th>
+							<th>Cost</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% for (Reservation reservation : currentReservations) { %>
+							<tr>
+								<td>
+									<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
+									<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
+	 							</td>
+								<td>
+									<b>Name:</b> <%= reservation.getCustomerFirstName() %> <%= reservation.getCustomerLastName() %><br>
+									<b>Email:</b> <%= reservation.getCustomerEmail() %>
+	 							</td>
+								<td>
+									<%= reservation.getTransitLineName() %>
+	 							</td>
+	 							<td>
+									<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>
+									<b>Location:</b> <%= reservation.getOrigin().getCity() %>, <%= reservation.getOrigin().getState() %> 
+	 							</td>
+	 							<td>
+	 								<b>Arrival:</b> <%= reservation.getFormattedOriginStationArrivalTime() %> <br>
+	 								<b>Departure:</b> <%= reservation.getFormattedOriginStationDepartureTime() %>
+	 							</td>
+	 							 <td>
+									<b>Name:</b> <%= reservation.getDestination().getName() %> <br>
+									<b>Location:</b> <%= reservation.getDestination().getCity() %>, <%= reservation.getDestination().getState() %> 
+	 							</td>
+	 							 <td>
+	 								<b>Arrival:</b> <%= reservation.getFormattedDestinationStationArrivalTime() %> <br>
+	 								<b>Departure:</b> <%= reservation.getFormattedDestinationStationDepartureTime() %>
+	 							</td>
+	 							<td>
+	 								<b>Total Cost:</b> <%= String.format("$%.2f", reservation.getOriginalFare()) %> <br>
+	 								<b>Discount <span style="color:green">(-<%= reservation.getDiscountRate() %>%)</span>:</b> <%= String.format("-$%.2f", reservation.getCustomerDiscount()) %> <br>
+	 								<b>Final Cost: <%= String.format("$%.2f", reservation.getCustomerFare()) %></b>
+	 							</td>
+			                    <td>
+					                <form action="cancelReservation.jsp" method="POST" style="display:inline">	                	
+					                	<input type="hidden" name="cancel" value="<%= reservation.getReservationNo() %>">
+									    <button type="submit">Cancel</button>
+									</form>
+			                    </td>
+							</tr>
+						<% } %>
+					</tbody>
+				</table>
+			<% } %>
 		</div>
 		
-		
-		<h3>Past Reservations</h3> <!-- collapsible -->
+		<details>
+			<summary><h3>Past Reservations</h3></summary>
+			
+			<div class="reservation-container">
+				<% if (pastReservations.isEmpty()) { %> 
+					<p>No previous reservations.</p>
+				<% } else { %>
+					<table>
+						<thead>
+							<tr>
+								<th>Reservation</th>
+								<th>Passenger</th>
+								<th>Transit Line</th>
+								<th>Origin</th>
+								<th>Time</th>
+								<th>Destination</th>
+								<th>Time</th>
+								<th>Cost</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<% for (Reservation reservation : pastReservations) { %>
+								<tr>
+									<td>
+										<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
+										<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
+		 							</td>
+									<td>
+										<b>Name:</b> <%= reservation.getCustomerFirstName() %> <%= reservation.getCustomerLastName() %><br>
+										<b>Email:</b> <%= reservation.getCustomerEmail() %>
+		 							</td>
+									<td>
+										<%= reservation.getTransitLineName() %>
+		 							</td>
+		 							<td>
+										<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>
+										<b>Location:</b> <%= reservation.getOrigin().getCity() %>, <%= reservation.getOrigin().getState() %> 
+		 							</td>
+		 							<td>
+		 								<b>Arrival:</b> <%= reservation.getFormattedOriginStationArrivalTime() %> <br>
+		 								<b>Departure:</b> <%= reservation.getFormattedOriginStationDepartureTime() %>
+		 							</td>
+		 							 <td>
+										<b>Name:</b> <%= reservation.getDestination().getName() %> <br>
+										<b>Location:</b> <%= reservation.getDestination().getCity() %>, <%= reservation.getDestination().getState() %> 
+		 							</td>
+		 							 <td>
+		 								<b>Arrival:</b> <%= reservation.getFormattedDestinationStationArrivalTime() %> <br>
+		 								<b>Departure:</b> <%= reservation.getFormattedDestinationStationDepartureTime() %>
+		 							</td>
+		 							<td>
+		 								<b>Total Cost:</b> <%= String.format("$%.2f", reservation.getOriginalFare()) %> <br>
+		 								<b>Discount <span style="color:green">(-<%= reservation.getDiscountRate() %>%)</span>:</b> <%= String.format("-$%.2f", reservation.getCustomerDiscount()) %> <br>
+		 								<b>Final Cost: <%= String.format("$%.2f", reservation.getCustomerFare()) %></b>
+		 							</td>
+				                    <td>
+						                <form action="cancelReservation.jsp" method="POST" style="display:inline">	                	
+						                	<input type="hidden" name="cancel" value="<%= reservation.getReservationNo() %>">
+										    <button type="submit">Cancel</button>
+										</form>
+				                    </td>
+								</tr>
+							<% } %>
+						</tbody>
+					</table>
+				<% } %>
+			</div>
+		</details>
     </div>
  
 

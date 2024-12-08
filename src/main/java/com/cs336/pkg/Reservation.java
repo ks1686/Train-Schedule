@@ -18,6 +18,7 @@ public class Reservation {
 	private String transitLineName;
 	private float transitLineFare;
 
+	private float originalFare;
 	private float customerDiscount;
 	private float customerFare;
 
@@ -66,9 +67,9 @@ public class Reservation {
 	private void calculateCustomerFareAndDiscount() {
 		int multiplier = isRoundTrip ? 2 : 1;
 		
-		float fare = transitLineFare * multiplier;
-		this.customerDiscount = transitLineFare * discountRate;
-		this.customerFare = fare - customerDiscount;
+		this.originalFare = transitLineFare * multiplier;
+		this.customerDiscount = originalFare * ((float) discountRate/100);
+		this.customerFare = originalFare - customerDiscount;
 	}
 
 	public int getReservationNo() { return reservationNo; }
@@ -94,6 +95,8 @@ public class Reservation {
 	public String getTransitLineName() { return transitLineName; }
 
 	public float getTransitLineFare() { return transitLineFare; }
+
+	public float getOriginalFare() { return originalFare; }
 	
 	public float getCustomerDiscount() { return customerDiscount; }
 	
