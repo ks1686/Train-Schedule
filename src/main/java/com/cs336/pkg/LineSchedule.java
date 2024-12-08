@@ -2,11 +2,8 @@ package com.cs336.pkg;
 
 import java.util.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
 
 public class LineSchedule {
-    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("EEE, MMM d, yyyy, h:mm a");
-    
 	private int lineId;
 	private String lineName;
 	
@@ -28,11 +25,11 @@ public class LineSchedule {
 		this.lineName = lineName;
 		
 		this.origin = new Station(originStationId, originStationName, originCity, originState);
-		this.departureDateTime = strToDateTime(departureDateTime);
+		this.departureDateTime = DateTimeConversion.strToDateTime(departureDateTime);
 		this.originIndex = -1;
 		
 		this.destination = new Station(destinationStationId, destinationStationName, destinationCity, destinationState);
-		this.arrivalDateTime = strToDateTime(arrivalDateTime);
+		this.arrivalDateTime = DateTimeConversion.strToDateTime(arrivalDateTime);
 		this.destinationIndex = -1;
 		
 		this.lineFare = lineFare;
@@ -43,8 +40,8 @@ public class LineSchedule {
 		Station station = new Station(stationId, stationName, stationCity, stationState);
 		Object[] stop = new Object[] 
 				{station, 
-				strToDateTime(arrivalDateTime).format(dateTimeFormatter), 
-				strToDateTime(departureDateTime).format(dateTimeFormatter), 
+				DateTimeConversion.strToDateTime(arrivalDateTime).format(DateTimeConversion.dateTimeFormatter), 
+				DateTimeConversion.strToDateTime(departureDateTime).format(DateTimeConversion.dateTimeFormatter), 
 				"black", 
 				false}; // stop[3] = css color, stop[4] = html bolding
 		
@@ -69,7 +66,7 @@ public class LineSchedule {
 
 	public LocalDateTime getDepartureDateTime() { return departureDateTime; }
 	
-	public String getFormattedDepartureDateTime() { return departureDateTime.format(dateTimeFormatter); }
+	public String getFormattedDepartureDateTime() { return departureDateTime.format(DateTimeConversion.dateTimeFormatter); }
 	
 	public int getOriginIndex() { return originIndex; }
 
@@ -77,7 +74,7 @@ public class LineSchedule {
 
 	public LocalDateTime getArrivalDateTime() { return arrivalDateTime; }
 	
-	public String getFormattedArrivalDateTime() { return arrivalDateTime.format(dateTimeFormatter); }
+	public String getFormattedArrivalDateTime() { return arrivalDateTime.format(DateTimeConversion.dateTimeFormatter); }
 	
 	public int getDestinationIndex() { return destinationIndex; }
 	
@@ -96,37 +93,4 @@ public class LineSchedule {
 	}
 	
 	public List<Object[]> getStops() { return stops; }
-	
-	private LocalDateTime strToDateTime(String str) {
-		String[] date_time = str.split("\\s+");
-		
-		LocalDate date = strToDate(date_time[0]);
-		LocalTime time = strToTime(date_time[1]);
-		
-		return LocalDateTime.of(date, time);
-	}
-	
-	private LocalDate strToDate(String str) {
-		String[] yyyy_MM_dd = str.split("-");
-		
-		int year = Integer.valueOf(yyyy_MM_dd[0]);
-		int month = Integer.valueOf(yyyy_MM_dd[1]);
-		int day = Integer.valueOf(yyyy_MM_dd[2]);
-		
-		return LocalDate.of(year, month, day);
-	}
-	
-	private LocalTime strToTime(String str) {
-		String[] HH_mm_ssns = str.split(":");
-		
-		int hour = Integer.valueOf(HH_mm_ssns[0]);
-		int minute = Integer.valueOf(HH_mm_ssns[1]);
-		
-		String[] ss_ns = HH_mm_ssns[2].split("\\.");
-		
-		int second = Integer.valueOf(ss_ns[0]);
-		int nano = Integer.valueOf(ss_ns[1]) * (int) 1e9;
-		
-		return LocalTime.of(hour, minute, second, nano);
-	}
 }
