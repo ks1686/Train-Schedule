@@ -267,6 +267,9 @@
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
+    <form method="POST" action="customerWelcome.jsp">
+    	<button name="clear">Clear And Go Back</button>
+    </form>
     <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
