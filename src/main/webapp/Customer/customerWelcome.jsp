@@ -106,6 +106,7 @@
     }
     
     String reservationStatus = request.getParameter("reservation");
+    String cancellationStatus = request.getParameter("cancellation");
 
     String errorMessage = null;
     List<Station> uniqueStations = new ArrayList<>();
@@ -229,7 +230,22 @@
     				<p style="color: red">500: Internal server error while placing reservation. Please try again.</p>
     	<% 		} 
     		} 
-    	%>
+    	
+    		if (cancellationStatus != null) { 
+    				if (cancellationStatus.equals("success")) { %>
+    			
+					<p style="color: red">Reservation Canceled</p>
+				
+				<% } else if (cancellationStatus.equals("failure")) { %>
+				   	
+					<p style="color: red">Could not cancel reservation. Please try again.</p>
+				
+				<% } else if (cancellationStatus.equals("error")) { %>
+			
+					<p style="color: red">500: Internal server error while canceling reservation. Please try again.</p>
+		<% 		} 	
+			} 
+		%>
     
 		<!--  book reservations  -->
 		<h3>Book Reservation</h3>

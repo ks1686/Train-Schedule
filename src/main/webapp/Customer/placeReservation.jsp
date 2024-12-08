@@ -10,7 +10,7 @@
         return;
     }
     
-    // Check if the user is a manager   
+    // Check if the user is a Customer   
     if (!session.getAttribute("role").equals("Customer")) {
         response.sendRedirect("../403.jsp");
         return;
