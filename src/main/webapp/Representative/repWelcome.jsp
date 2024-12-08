@@ -275,7 +275,9 @@
 <body>
 
 <%
-    if (session == null || session.getAttribute("username") == null) {
+    String username = (String) session.getAttribute("username");
+    
+    if (session == null || username == null) {
         response.sendRedirect("../login.jsp");
         return;
     }
@@ -286,7 +288,6 @@
         return;
     }
 
-    String username = (String) session.getAttribute("username");
     String errorMessage = null;
     List<String> questions = new ArrayList<>();
     List<String> answers = new ArrayList<>();
