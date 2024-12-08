@@ -103,7 +103,7 @@
             ApplicationDB db = new ApplicationDB();
             conn = db.getConnection();
             StringBuilder query = new StringBuilder(
-                "SELECT r.reservationNo, r.customerId, r.transitLineId, r.originStationId, r.destinationStationId, " +
+                "SELECT r.reservationNo, r.customerId, r.transitLineId, r.originStopId, r.destinationStopId, " +
                 "r.reservationDateTime, r.isRoundTrip, t.lineName, c.firstName, c.lastName " +
                 "FROM Reservation r " +
                 "JOIN TransitLine t ON r.transitLineId = t.lineId " +
@@ -158,8 +158,8 @@
                 out.println("<td>" + rs.getInt("reservationNo") + "</td>");
                 out.println("<td>" + rs.getString("firstName") + " " + rs.getString("lastName") + "</td>");
                 out.println("<td>" + rs.getString("lineName") + "</td>");
-                out.println("<td>" + rs.getInt("originStationId") + "</td>");
-                out.println("<td>" + rs.getInt("destinationStationId") + "</td>");
+                out.println("<td>" + rs.getInt("originStopId") + "</td>");
+                out.println("<td>" + rs.getInt("destinationStopId") + "</td>");
                 out.println("<td>" + rs.getTimestamp("reservationDateTime") + "</td>");
                 out.println("<td>" + (rs.getBoolean("isRoundTrip") ? "Yes" : "No") + "</td>");
                 out.println("</tr>");
