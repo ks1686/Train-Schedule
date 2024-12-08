@@ -33,13 +33,12 @@ CREATE TABLE Train (
 
 -- Table: Stop
 CREATE TABLE Stop (
-    stopId INT AUTO_INCREMENT,
+    stopId INT AUTO_INCREMENT UNIQUE,
     stopStation INT,
     stopLine INT,
     departureDateTime DATETIME,
     arrivalDateTime DATETIME,
     PRIMARY KEY(stopId, stopStation, stopLine),
-    UNIQUE (stopId)
     FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -117,6 +116,7 @@ CREATE TABLE Reservation (
     destinationStationId INT,
     reservationDateTime DATETIME,
     isRoundTrip BOOLEAN,
+    discount INT CHECK (discount <= 100),
     FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (transitLineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (originStationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,

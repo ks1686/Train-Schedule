@@ -142,7 +142,6 @@
     String originStationId = request.getParameter("originStationId") != null ? request.getParameter("originStationId") : (String) session.getAttribute("originStationId");
     String destinationStationId = request.getParameter("destinationStationId") != null ? request.getParameter("destinationStationId") : (String) session.getAttribute("destinationStationId");
     String reservationDate = request.getParameter("reservationDate") != null ? request.getParameter("reservationDate") : (String) session.getAttribute("reservationDate");
-    String earliestReturnTime = request.getParameter("earliestReturnTime") != null ? request.getParameter("earliestReturnTime") : (String) session.getAttribute("earliestReturnTime");
     
     session.setAttribute("originStationId", originStationId);
     session.setAttribute("destinationStationId", destinationStationId);
@@ -184,17 +183,11 @@
 		        		"JOIN Station s2 ON stop2.stopStation = s2.stationId " +
 		        		"WHERE s1.stationId = ? AND s2.stationId = ? AND CAST(stop1.departureDateTime AS DATE) = ? AND stop1.departureDateTime < stop2.arrivalDateTime";
         
-        if (earliestReturnTime != null) {
-        	query2 += " AND CAST(stop1.departureDateTime AS TIME) > ?";
-        }
         
         ps2 = conn.prepareStatement(query2);
         ps2.setString(1, originStationId);
         ps2.setString(2, destinationStationId);
         ps2.setString(3, reservationDate);
-        if (earliestReturnTime != null) {
-            ps2.setString(4, earliestReturnTime);
-        }
         rs2 = ps2.executeQuery();
         
         while (rs2.next()) {
@@ -286,7 +279,7 @@
 		<h3>View Alternate Schedules</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">
 			<label>Origin: </label>
-			<select name="originStationId" required <%= session.getAttribute("reserving") != null ? "disabled" : ""%>>
+			<select name="originStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"
@@ -297,7 +290,7 @@
 			</select>
 			
 			<label>Destination: </label>
-			<select name="destinationStationId" required <%= session.getAttribute("reserving") != null ? "disabled" : ""%>>
+			<select name="destinationStationId" required>
 				<option value=""></option>
 				<% for (Station station : uniqueStations) { %>
 					<option value="<%= station.getStationId() %>"

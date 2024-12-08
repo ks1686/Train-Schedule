@@ -131,39 +131,17 @@
         response.sendRedirect("../403.jsp");
         return;
     }
-    
-    if (request.getParameter("clear") != null && session.getAttribute("reserving") != null) {
-        session.removeAttribute("reserving");
-        response.sendRedirect("viewSchedules.jsp");
-        return;
-    }
 
     String username = (String) session.getAttribute("username");
     String errorMessage = null;
     
     String lineId = request.getParameter("reserve");
-    LineSchedule line = (LineSchedule) session.getAttribute("line: " + lineId);
-    
-    List<LineSchedule> reservation = session.getAttribute("reserving") != null ? (List<LineSchedule>) session.getAttribute("reserving") : new ArrayList<>();
-    
-    // can't be on the same transitLine
-    boolean checkDupe = true;
-    for (LineSchedule sched : reservation) {
-    	if (sched.getLineId() == Integer.valueOf(lineId)) {
-    		checkDupe = false;
-    		break;
-    	}
-    }
-    
-    if (checkDupe) {
-    	reservation.add(line); 
-    	session.setAttribute("reserving", reservation);
-    }  
+    LineSchedule sched = (LineSchedule) session.getAttribute("line: " + lineId);
 %>
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
-    <form method="POST" action="confirmReservation.jsp">
+    <form method="POST" action="viewSchedules.jsp">
     	<button name="clear">Clear And Go Back</button>
     </form>
     <a href="../logout.jsp" class="logout-button">Logout</a>
@@ -188,107 +166,113 @@
             </tr>
         </thead>
         <tbody>
-           	<%            
-            for (LineSchedule sched : reservation) { 
-            %>
-               <tr>
-                   <td><%= sched.getLineName() %></td>
-                   <td><%= sched.getOrigin().toString() %></td>
-                   <td><%= sched.getFormattedDepartureDateTime() %></td>
-                   <td><%= sched.getDestination().toString() %></td>
-                   <td><%= sched.getFormattedArrivalDateTime() %></td>
-                   <td><b>$<%= String.format("%.02f", sched.getEstimatedFare()) %></b></td>
-               </tr>
-            <% } %>
+		    <tr>
+		        <td><%= sched.getLineName() %></td>
+		        <td><%= sched.getOrigin().toString() %></td>
+		        <td><%= sched.getFormattedDepartureDateTime() %></td>
+		        <td><%= sched.getDestination().toString() %></td>
+		        <td><%= sched.getFormattedArrivalDateTime() %></td>
+		        <td><b>$<%= String.format("%.02f", sched.getEstimatedFare()) %></b></td>
+		    </tr>
         </tbody>      
 	    </table>
 	</div>
 	
     <details>
         <summary>View Stops</summary>
-        <% for (int ss = 0; ss < reservation.size(); ss++) { 
-        		LineSchedule sched = reservation.get(ss);
-				if (ss == 0) {
-        %>
-        		<h4>Departure</h4>
-        	<% } else if (ss == 1) { %>
-        		<h4>Arrival</h4>
-        	<% } %>
-	        <table>
-	        <thead>
-	            <tr>
-	                <th>Station</th>
-	                <th>Arrival Time</th>
-	                <th>Departure Time</th>
-	                <th>Estimated Fare</th>
-	            </tr>
-	        </thead>
-	        <tbody>
-	            <%
-	            List<Object[]> lineStops = sched.getStops();
-	            for (int ii = 0; ii < lineStops.size(); ii++) {
-	                Object[] stop = lineStops.get(ii);
-	                String stationName = stop[0].toString();
-	                String arrivalTime = (String) stop[1], departureTime = (String) stop[2];
-	                String color = (String) stop[3];
-	                boolean bold = (boolean) stop[4];
-	                
-	                float estimatedFare = sched.getEstimatedFare(ii);
-	                String estFareStr = String.format("$%.2f", estimatedFare);
-	                if (estimatedFare == -1) estFareStr = "N/A";
-	                
-	                if (bold) {
-	                    stationName = "<b>" + stationName + "</b>";
-	                    arrivalTime = "<b>" + arrivalTime + "</b>";
-	                    departureTime = "<b>" + departureTime + "</b>";
-	                    estFareStr = "<b>" + estFareStr + "</b>";
-	                }
-	            %>
-	            <tr>
-	                <td style="color:<%= color %>"><%= stationName %></td>
-	                <td style="color:<%= color %>"><%= arrivalTime %></td>
-	                <td style="color:<%= color %>"><%= departureTime %></td>
-	                <td style="color:<%= color %>"><%= estFareStr %></td>
-	            </tr>
-	        <% } %>
-	        </tbody>
-	        </table>
+        <table>
+        <thead>
+            <tr>
+                <th>Station</th>
+                <th>Arrival Time</th>
+                <th>Departure Time</th>
+                <th>Estimated Fare</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+            List<Object[]> lineStops = sched.getStops();
+            for (int ii = 0; ii < lineStops.size(); ii++) {
+                Object[] stop = lineStops.get(ii);
+                String stationName = stop[0].toString();
+                String arrivalTime = (String) stop[1], departureTime = (String) stop[2];
+                String color = (String) stop[3];
+                boolean bold = (boolean) stop[4];
+                
+                float estimatedFare = sched.getEstimatedFare(ii);
+                String estFareStr = String.format("$%.2f", estimatedFare);
+                if (estimatedFare == -1) estFareStr = "N/A";
+                
+                if (bold) {
+                    stationName = "<b>" + stationName + "</b>";
+                    arrivalTime = "<b>" + arrivalTime + "</b>";
+                    departureTime = "<b>" + departureTime + "</b>";
+                    estFareStr = "<b>" + estFareStr + "</b>";
+                }
+            %>
+            <tr>
+                <td style="color:<%= color %>"><%= stationName %></td>
+                <td style="color:<%= color %>"><%= arrivalTime %></td>
+                <td style="color:<%= color %>"><%= departureTime %></td>
+                <td style="color:<%= color %>"><%= estFareStr %></td>
+            </tr>
         <% } %>
+        </tbody>
+        </table>
     </details>    
     
-    <br>
-       
-    <% if (reservation.size() == 1) { 
-    	LineSchedule sched = reservation.get(0);
-    %>
-    	<h2>Book Round Trip</h2>
-	   	<form method="POST" action="viewSchedules.jsp" style="display: inline">
-			<input type="hidden" name="originStationId" value="<%= sched.getDestination().getStationId() %>">
-			
-			<input type="hidden" name="destinationStationId" value="<%= sched.getOrigin().getStationId() %>">
-			
-			<input type="hidden" name="earliestReturnTime" value="<%= reservation.get(0).getArrivalDateTime().toLocalTime() %>"> <!-- TODO: return must be after arrival time in viewschedules -->
-			
-			<label>Date of Return: </label>	            
-	        <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>" min="<%= reservation.get(0).getArrivalDateTime().toLocalDate() %>">
-			
-			<button type="submit">Book Round Trip</button>
-		</form>
-	<% } %>
     
     <br>
     
-    <form method="POST" action="">
-    	<label>Age</label>
-    	<input type="text" name="age" placeholder="Age" required /><br>
-    	<label>(discount applicable for children 12 and under or seniors 65 and over)<br></label>
+   	<h2>Finalize Reservation</h2>
+   	<details>
+   		<summary>Discounts Available</summary>
+   		<p>Discounts don't stack! (eg. A child with a disability will have a 50% discount)
+	   	<table>
+	   		<thead>
+	   			<tr>
+	   				<th>Status</th>
+	   				<th>Discount</th>
+	   		</thead>
+	   		<tbody>
+	   			<tr>
+	   				<td>Children (0-12)</td>
+	   				<td>25%</td>
+	   			</tr>
+	   			<tr>
+	   				<td>Senior (65+)</td>
+	   				<td>35%</td>
+	   			</tr>
+	   			<tr>
+	   				<td>Disabled</td>
+	   				<td>50%</td>
+	   			</tr>
+	   		</tbody>
+	   	</table>
+   	</details>
+   	<br>
+    <form method="POST" action="placeReservation.jsp">
+    	<input type="hidden" name="reserve" value="<%= lineId %>">
+    
+    	<label>Trip Type:</label>
+        <label>
+    		<input type="radio" name="tripType" value="oneway" required>One Way
+    	</label>
+    	<label>
+    		<input type="radio" name="tripType" value="round" required>Round Trip
+    	</label>
+    	<label style="color:gray">(return fare for round trip is same as departure - total price 2x final price)<br></label>
+    	
+    	<label>Age:</label>
+    	<input type="number" name="age" placeholder="Age" required min="0" />
+    	<label style="color:gray">(discount applicable for children 12 and under or seniors 65 and over)<br></label>
     	
        	<label>Do you have a disability?</label>
        	<label>
-    		<input type="radio" name="disability" value="yes" placeholder="Age">Yes
+    		<input type="radio" name="disability" value="yes" required>Yes
     	</label>
     	<label>
-    		<input type="radio" name="disability" value="no" placeholder="Age">No
+    		<input type="radio" name="disability" value="no" required>No
     	</label>
     	
     	<br>
