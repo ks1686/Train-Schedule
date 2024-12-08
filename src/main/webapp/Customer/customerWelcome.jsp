@@ -182,8 +182,12 @@
             											reservationOriginStopId, reservationOriginStationId, reservationOriginStationName, reservationOriginCity, reservationOriginState, originStationArrivalTime, originStationDepartureTime,
 									            		reservationDestinationStopId, reservationDestinationStationId, reservationDestinationStationName, reservationDestinationCity, reservationDestinationState, destinationStationArrivalTime, destinationStationDepartureTime);
         
-        
-            System.out.println(reservation.toString());
+
+			if (reservation.isPastReservation()) {
+				pastReservations.add(reservation);
+			} else {
+				currentReservations.add(reservation);
+			}
         }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
@@ -254,6 +258,10 @@
 		
 		<!--  view reservations  -->
 		<h3>Upcoming Reservations</h3>
+		<div class="reservation-container">
+			
+		</div>
+		
 		
 		<h3>Past Reservations</h3> <!-- collapsible -->
     </div>

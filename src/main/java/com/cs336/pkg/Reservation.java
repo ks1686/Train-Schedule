@@ -32,6 +32,7 @@ public class Reservation {
 	private LocalDateTime destinationStationDepartureTime;
 	
 
+	// TODO: validate null inputs
 	public Reservation(int reservationNo, String reservationDateTime, boolean isRoundTrip, int discountRate, int customerId, String customerFirstName, String customerLastName, String customerEmail, int transitLineId, String transitLineName, float transitLineFare, 
 						int reservationOriginStopId, int reservationOriginStationId, String reservationOriginStationName, String reservationOriginCity, String reservationOriginState, String originStationArrivalTime, String originStationDepartureTime,
 						int reservationDestinationStopId, int reservationDestinationStationId, String reservationDestinationStationName, String reservationDestinationCity, String reservationDestinationState, String destinationStationArrivalTime, String destinationStationDepartureTime) {
@@ -51,13 +52,13 @@ public class Reservation {
 		
 		this.originStopId = reservationOriginStopId;
 		this.origin = new Station(reservationOriginStationId, reservationOriginStationName, reservationOriginCity, reservationOriginState);
-		this.originStationArrivalTime = DateTimeConversion.strToDateTime(originStationArrivalTime);
-		this.originStationDepartureTime = DateTimeConversion.strToDateTime(originStationDepartureTime);
+		this.originStationArrivalTime = originStationArrivalTime == null ? null : DateTimeConversion.strToDateTime(originStationArrivalTime);
+		this.originStationDepartureTime = originStationDepartureTime == null ? null : DateTimeConversion.strToDateTime(originStationDepartureTime);
 		
 		this.destinationStopId = reservationDestinationStopId;
 		this.destination = new Station(reservationDestinationStationId, reservationDestinationStationName, reservationDestinationCity, reservationDestinationState);
-		this.destinationStationArrivalTime = DateTimeConversion.strToDateTime(destinationStationArrivalTime);
-		this.destinationStationDepartureTime = DateTimeConversion.strToDateTime(destinationStationDepartureTime);
+		this.destinationStationArrivalTime = destinationStationArrivalTime == null ? null : DateTimeConversion.strToDateTime(destinationStationArrivalTime);
+		this.destinationStationDepartureTime = destinationStationDepartureTime == null ? null : DateTimeConversion.strToDateTime(destinationStationDepartureTime);
 		
 		calculateCustomerFareAndDiscount();
 	}
@@ -122,6 +123,12 @@ public class Reservation {
 
 	public String getFormattedDestinationStationDepartureTime() { return destinationStationDepartureTime.format(DateTimeConversion.dateTimeFormatter); }
 
+	public boolean isPastReservation() {
+		LocalDateTime destinationArrival = destinationStationDepartureTime != null ? destinationStationDepartureTime : destinationStationArrivalTime;
+		
+		return LocalDateTime.now().isAfter(destinationArrival);
+	}
+	
 	public String toString() {
 		return "Reservation No: " + reservationNo + "\n" +
 				"Reservation Date Time: " + reservationDateTime.format(DateTimeConversion.dateTimeFormatter) + "\n" +
