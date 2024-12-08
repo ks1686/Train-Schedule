@@ -19,15 +19,14 @@
     String lineId = request.getParameter("reserve");
     LineSchedule sched = (LineSchedule) session.getAttribute("line: " + lineId);
 
+    int originStopId = (int) sched.getStops().get(sched.getOriginIndex())[0];
+    int destinationStopId = (int) sched.getStops().get(sched.getDestinationIndex())[0];
+
     String tripType = request.getParameter("tripType") != null ? request.getParameter("tripType") : "oneway";
     String age = request.getParameter("age") != null ? request.getParameter("age") : "21";
     String disability = request.getParameter("disability") != null ? request.getParameter("disability") : "no";
     
-    int multiplier = 1, discount = 0;
-	if (tripType.equals("round")) {
-		multiplier = 2;
-	}
-	
+    int discount = 0;
 	if (disability.equals("yes")) {
 		discount = 50;
 	} else if (((int) Integer.valueOf(age)) >= 65) {
@@ -43,17 +42,18 @@
         ApplicationDB db = new ApplicationDB();
         conn = db.getConnection();
 
-        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStationId, destinationStationId, reservationDateTime, isRoundTrip, discount) " + 
+        
+        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStopId, destinationStopId, reservationDateTime, isRoundTrip, discount) " +
         								"VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?, ?, ?, ?, ?, ?)";
         		
         ps = conn.prepareStatement(reservationInsertion);
        	ps.setString(1, username);
-       	ps.setString(2, "" + sched.getLineId());
-       	ps.setString(3, "" + sched.getOrigin().getStationId());
-       	ps.setString(4, "" + sched.getDestination().getStationId());
+       	ps.setInt(2, sched.getLineId());
+       	ps.setInt(3, originStopId);
+       	ps.setInt(4, destinationStopId);
        	ps.setString(5, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-       	ps.setString(6, tripType.equals("round") ? "TRUE" : "FALSE");
-       	ps.setString(7, "" + discount);
+       	ps.setBoolean(6, tripType.equals("round") ? true : false); 
+       	ps.setInt(7, discount);
 
         int rowsUpdated = ps.executeUpdate();
 
@@ -64,7 +64,7 @@
         }
     } catch (SQLException e) {
         e.printStackTrace();
-        response.sendRedirect("managerWelcome.jsp?update=error");
+        response.sendRedirect("customerWelcome.jsp?reservation=error");
     } finally {
         try {
             if (ps != null) ps.close();

@@ -36,22 +36,23 @@ public class LineSchedule {
 		this.stops = new ArrayList<>();
 	}
 	
-	public void addStop(int stationId, String stationName, String stationCity, String stationState, String arrivalDateTime, String departureDateTime) {
+	public void addStop(int stopId, int stationId, String stationName, String stationCity, String stationState, String arrivalDateTime, String departureDateTime) {
 		Station station = new Station(stationId, stationName, stationCity, stationState);
 		Object[] stop = new Object[] 
-				{station, 
+				{stopId,
+				station, 
 				DateTimeConversion.strToDateTime(arrivalDateTime).format(DateTimeConversion.dateTimeFormatter), 
 				DateTimeConversion.strToDateTime(departureDateTime).format(DateTimeConversion.dateTimeFormatter), 
 				"black", 
-				false}; // stop[3] = css color, stop[4] = html bolding
+				false}; // stop[4] = css color, stop[5] = html bolding
 		
 		if (stationId == origin.getStationId()) {
-			stop[3] = "orange";
-			stop[4] = true;
+			stop[4] = "orange";
+			stop[5] = true;
 			originIndex = stops.size();
 		} else if (stationId == destination.getStationId()) {
-			stop[3] = "green";
-			stop[4] = true;
+			stop[4] = "green";
+			stop[5] = true;
 			destinationIndex = stops.size();
 		}
 			

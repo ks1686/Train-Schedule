@@ -112,15 +112,15 @@ CREATE TABLE Reservation (
     reservationNo INT AUTO_INCREMENT PRIMARY KEY,
     customerId INT NOT NULL,
     transitLineId INT NOT NULL,
-    originStationId INT NOT NULL,
-    destinationStationId INT NOT NULL,
+    originStopId INT NOT NULL,
+    destinationStopId INT NOT NULL,
     reservationDateTime DATETIME NOT NULL,
     isRoundTrip BOOLEAN NOT NULL,
     discount INT CHECK (discount <= 100) NOT NULL,
     FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (transitLineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (originStationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (destinationStationId) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (originStopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (destinationStopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Table: RViews

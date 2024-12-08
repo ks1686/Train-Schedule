@@ -202,7 +202,7 @@
         
         
         // Get all stops on a transit line and their respective station
-        String query3 = "SELECT tl.lineId AS LineId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
+        String query3 = "SELECT tl.lineId AS LineId, stop.stopId as StopId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
 		        		"FROM TransitLine tl " +
 		        		"JOIN Stop stop ON tl.lineId = stop.stopLine " +
 		        		"JOIN Station s ON stop.stopStation = s.stationId";
@@ -213,7 +213,7 @@
         while (rs3.next()) {
         	int lineId = rs3.getInt("LineId");
         	if (scheduleRes.containsKey(lineId)) {
-        		scheduleRes.get(lineId).addStop(rs3.getInt("StationId"), rs3.getString("StationName"), rs3.getString("StationCity"), rs3.getString("StationState"), rs3.getString("ArrivalDateTime"), rs3.getString("DepartureDateTime"));
+        		scheduleRes.get(lineId).addStop(rs3.getInt("StopId"), rs3.getInt("StationId"), rs3.getString("StationName"), rs3.getString("StationCity"), rs3.getString("StationState"), rs3.getString("ArrivalDateTime"), rs3.getString("DepartureDateTime"));
         	}
         }
         
@@ -372,10 +372,10 @@
                     			List<Object[]> lineStops = sched.getStops();
                     			for (int ii = 0; ii < lineStops.size(); ii++) {
                     				Object[] stop = lineStops.get(ii);
-                    				String stationName = stop[0].toString();
-                    				String arrivalTime = (String) stop[1], departureTime = (String) stop[2];
-                    				String color = (String) stop[3];
-                    				boolean bold = (boolean) stop[4];
+                    				String stationName = stop[1].toString();
+                    				String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
+                    				String color = (String) stop[4];
+                    				boolean bold = (boolean) stop[5];
                     				
                     				float estimatedFare = sched.getEstimatedFare(ii);
                     				String estFareStr = String.format("$%.2f", estimatedFare);

@@ -195,10 +195,10 @@
             List<Object[]> lineStops = sched.getStops();
             for (int ii = 0; ii < lineStops.size(); ii++) {
                 Object[] stop = lineStops.get(ii);
-                String stationName = stop[0].toString();
-                String arrivalTime = (String) stop[1], departureTime = (String) stop[2];
-                String color = (String) stop[3];
-                boolean bold = (boolean) stop[4];
+                String stationName = stop[1].toString();
+                String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
+                String color = (String) stop[4];
+                boolean bold = (boolean) stop[5];
                 
                 float estimatedFare = sched.getEstimatedFare(ii);
                 String estFareStr = String.format("$%.2f", estimatedFare);
