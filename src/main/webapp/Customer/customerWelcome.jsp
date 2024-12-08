@@ -104,6 +104,8 @@
         response.sendRedirect("../403.jsp");
         return;
     }
+    
+    String reservationStatus = request.getParameter("reservation");
 
     String errorMessage = null;
     List<Station> uniqueStations = new ArrayList<>();
@@ -150,6 +152,19 @@
 
 <div class="main-container">
     <div class="top-half">
+    	<% if (reservationStatus != null) { 
+    			if (reservationStatus.equals("success")) { %>
+    			
+    				<p style="color: green">Reservation Secured</p>
+    				
+    			<% } else if (reservationStatus.equals("failure")) { %>
+    				   	
+    				<p style="color: red">Error securing reservation. Please try again.</p>
+    				
+    	<% 		} 
+    		} 
+    	%>
+    
 		<!--  book reservations  -->
 		<h3>Book Reservation</h3>
 		<form method="POST" action="viewSchedules.jsp" style="display: inline">

@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
-    pageEncoding="ISO-8859-1" import="java.io.*, java.sql.*"%>
+    pageEncoding="ISO-8859-1" import="java.io.*, java.sql.*,java.time.*,java.time.format.DateTimeFormatter"%>
 <%@ page import="com.cs336.pkg.*"%>
 
 <%
+	String username = (String) session.getAttribute("username");
 
-    if (session == null || session.getAttribute("username") == null) {
+    if (session == null || username == null) {
         response.sendRedirect("../login.jsp");
         return;
     }
@@ -42,22 +43,24 @@
         ApplicationDB db = new ApplicationDB();
         conn = db.getConnection();
 
-        // SQL query to update all fields for an employee
-        String updateQuery = "UPDATE Employee SET firstName = ?, lastName = ?, username = ?, password = ?, role = ? WHERE ssn = ?";
-        ps = conn.prepareStatement(updateQuery);
-        ps.setString(1, firstName);
-        ps.setString(2, lastName);
-        ps.setString(3, username);
-        ps.setString(4, password); // Assuming password is hashed before being stored in the database
-        ps.setString(5, role);
-        ps.setString(6, ssn);
+        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStationId, destinationStationId, reservationDateTime, isRoundTrip, discount) " + 
+        								"VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?, ?, ?, ?, ?, ?)";
+        		
+        ps = conn.prepareStatement(reservationInsertion);
+       	ps.setString(1, username);
+       	ps.setString(2, "" + sched.getLineId());
+       	ps.setString(3, "" + sched.getOrigin().getStationId());
+       	ps.setString(4, "" + sched.getDestination().getStationId());
+       	ps.setString(5, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+       	ps.setString(6, tripType.equals("round") ? "TRUE" : "FALSE");
+       	ps.setString(7, "" + discount);
 
         int rowsUpdated = ps.executeUpdate();
 
         if (rowsUpdated > 0) {
-            response.sendRedirect("managerWelcome.jsp?update=success");
+            response.sendRedirect("customerWelcome.jsp?reservation=success");
         } else {
-            response.sendRedirect("managerWelcome.jsp?update=failure");
+            response.sendRedirect("customerWelcome.jsp?reservation=failure");
         }
     } catch (SQLException e) {
         e.printStackTrace();
