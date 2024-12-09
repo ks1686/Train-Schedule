@@ -34,10 +34,10 @@ CREATE TABLE Train (
 -- Table: Stop
 CREATE TABLE Stop (
     stopId INT AUTO_INCREMENT UNIQUE,
-    stopStation INT,
-    stopLine INT,
-    departureDateTime DATETIME,
-    arrivalDateTime DATETIME,
+    stopStation INT NOT NULL,
+    stopLine INT NOT NULL,
+    departureDateTime DATETIME NOT NULL,
+    arrivalDateTime DATETIME NOT NULL,
     PRIMARY KEY(stopId, stopStation, stopLine),
     FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
