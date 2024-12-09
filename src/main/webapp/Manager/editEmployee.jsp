@@ -91,7 +91,6 @@
 
 <div class="main-container">
     <form method="POST" action="updateEmployee.jsp" class="edit-form">
-        <input type="hidden" name="username" value="<%= username %>">
         <input type="hidden" name="ssn" value="<%= ssn %>">
 
         <label for="firstName">First Name:</label>
@@ -104,7 +103,7 @@
         <input type="text" name="username" value="<%= username %>" required>
 
         <label for="password">Password:</label>
-        <input type="password" name="password" placeholder="Enter new password" required>
+        <input type="password" name="password" value="<%= password %>"placeholder="Enter new password" required>
 
         <label for="role">Role:</label>
         <select name="role" required>
