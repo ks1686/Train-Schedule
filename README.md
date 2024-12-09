@@ -82,3 +82,10 @@ This project is a Train Reservation System that allows customers to make reserva
 3. **Compile and Run the Application**.
 
 By following these steps, you can set up, configure, and test the Train Reservation System.
+
+## Contributors
+Vian Miranda: ERD, Database Schema, Java Classes, JSP Pages
+Parth Patel: ERD, Database Schema, Java Classes, JSP Pages
+Karim Smires: ERD, Database Schema, Java Classes, JSP Pages
+Raghav Kannan: Absolutely nothing
+```
