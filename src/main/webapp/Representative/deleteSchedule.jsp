@@ -33,7 +33,8 @@
 
             int result = ps.executeUpdate();
             if (result > 0) {
-                out.print("success");
+                // redirect back to repWelcome.jsp
+                response.sendRedirect("repWelcome.jsp");
             } else {
                 out.print("failure");
             }
