@@ -108,7 +108,10 @@
         // SQL query to get the sales report data for the given month and year
         String query = "SELECT t.lineName AS 'Line Name', " +
                        "COUNT(r.reservationNo) AS 'Total Reservations', " +
-                       "SUM(t.fare) AS 'Total Revenue' " +
+                       "SUM(CASE WHEN r.isRoundTrip = TRUE " +
+                       "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
+                       "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
+                       "	END) AS 'Total Revenue' " +
                        "FROM Reservation r " +
                        "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                        "WHERE MONTH(r.reservationDateTime) = ? AND YEAR(r.reservationDateTime) = ? " +
@@ -135,10 +138,15 @@
         out.println("</thead>");
         out.println("<tbody>");
 
+        int companyReservations = 0;
+        double companyRevenue = 0;
+        
         while (rs.next()) {
             String lineName = rs.getString("Line Name");
             int totalReservations = rs.getInt("Total Reservations");
             double totalRevenue = rs.getDouble("Total Revenue");
+            companyReservations += totalReservations;
+            companyRevenue += totalRevenue;
             out.println("<tr>");
             out.println("<td>" + lineName + "</td>");
             out.println("<td>" + totalReservations + "</td>");
@@ -146,6 +154,12 @@
             out.println("</tr>");
         }
 
+        out.println("<tr>");
+        out.println("<td></td>");
+        out.println("<td><b>" + companyReservations + "</b></td>");
+        out.println("<td><b>" + String.format("$%.2f", companyRevenue) + "</b></td>");
+        out.println("</tr>");
+        
         out.println("</tbody>");
         out.println("</table>");
         out.println("<br><button class='compact-button' onclick=\"window.location.href='managerWelcome.jsp'\">Back to Dashboard</button>");

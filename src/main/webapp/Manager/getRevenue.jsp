@@ -110,7 +110,11 @@
             // Check if both transitLine and customerName are provided
             if (transitLine != null && !transitLine.isEmpty() && customerName != null && !customerName.isEmpty()) {
                 // Query for revenue by transit line and customer name
-                query.append("SELECT t.lineName, CONCAT(c.firstName, ' ', c.lastName) AS customerName, SUM(t.fare) AS totalRevenue " +
+                query.append("SELECT t.lineName, CONCAT(c.firstName, ' ', c.lastName) AS customerName, " +
+	                         "SUM(CASE WHEN r.isRoundTrip = TRUE " +
+	                         "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
+	                         "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
+	                         "	  END) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "JOIN Customer c ON r.customerId = c.customerId " +
@@ -123,7 +127,11 @@
                 ps.setString(2, customerName);
             } else if (transitLine != null && !transitLine.isEmpty()) {
                 // Query for revenue by transit line only
-                query.append("SELECT t.lineName, SUM(t.fare) AS totalRevenue " +
+                query.append("SELECT t.lineName, " +
+	                         "SUM(CASE WHEN r.isRoundTrip = TRUE " +
+	                         "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
+	                         "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
+	                         "    END) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "WHERE t.lineName = ? " +
@@ -134,7 +142,11 @@
                 ps.setString(1, transitLine);
             } else if (customerName != null && !customerName.isEmpty()) {
                 // Query for revenue by customer name only
-                query.append("SELECT CONCAT(c.firstName, ' ', c.lastName) AS customerName, SUM(t.fare) AS totalRevenue " +
+                query.append("SELECT CONCAT(c.firstName, ' ', c.lastName) AS customerName, " +
+                        	 "SUM(CASE WHEN r.isRoundTrip = TRUE " +
+                        	 "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
+                        	 "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
+                        	 "	  END) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "JOIN Customer c ON r.customerId = c.customerId " +
