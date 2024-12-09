@@ -7,18 +7,43 @@
 <head>
     <title>Edit Employee</title>
     <style>
-        .edit-form {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+
+        .main-container {
             width: 100%;
             max-width: 500px;
             margin: 20px auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .edit-form input,
         .edit-form select {
             display: block;
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 90%;
             border-radius: 4px;
             border: 1px solid #ddd;
         }
@@ -31,6 +56,7 @@
             padding: 10px 20px;
             cursor: pointer;
             width: 100%;
+            font-size: 16px;
         }
 
         .edit-form button:hover {
@@ -61,8 +87,9 @@
     String role = request.getParameter("role");
 %>
 
+<div class="header">Edit Employee Details</div>
+
 <div class="main-container">
-    <h2>Edit Employee Details</h2>
     <form method="POST" action="updateEmployee.jsp" class="edit-form">
         <input type="hidden" name="username" value="<%= username %>">
         <input type="hidden" name="ssn" value="<%= ssn %>">
@@ -81,7 +108,6 @@
 
         <label for="role">Role:</label>
         <select name="role" required>
-            <option value="Manager" <%= role.equals("Manager") ? "selected" : "" %>>Manager</option>
             <option value="Representative" <%= role.equals("Representative") ? "selected" : "" %>>Representative</option>
         </select>
 

@@ -9,9 +9,9 @@ import java.util.logging.Logger;
 public class ApplicationDB {
 
 	// Database connection parameters
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/trains";
-	private static final String DB_USER = "root";
-	private static final String DB_PASSWORD = "REDACTED"; // edit password as needed
+	private static final String DB_URL = "jdbc:mysql://localhost:3306/trains"; // change the port number if necessary
+	private static final String DB_USER = "root"; // set your MySQL username here
+	private static final String DB_PASSWORD = ""; // set your MySQL password here
 	private static final Logger LOGGER = Logger.getLogger(ApplicationDB.class.getName());
 	
 	// Constructor

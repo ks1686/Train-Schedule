@@ -55,13 +55,6 @@ INSERT INTO `Stop` (`stopId`, `stopStation`, `stopLine`, `departureDateTime`, `a
 (4, 2, 2, '2024-12-11 18:02:00', '2024-12-11 18:00:00'),
 (5, 3, 5, '2024-12-14 14:00:00', '2024-12-14 13:58:00');
 
-INSERT INTO `SViews` (`ssn`, `stopId`, `stopStation`, `stopLine`) VALUES
-('456-78-9012', 2, 4, 1),
-('456-78-9012', 5, 3, 5),
-('654-32-1098', 3, 3, 2),
-('987-65-4321', 1, 1, 1),
-('987-65-4321', 4, 2, 2);
-
 INSERT INTO `Train` (`trainId`, `trainName`, `lineId`) VALUES
 (1, 'Amtrak 101', 1),
 (2, 'Amtrak 201', 2),
@@ -75,10 +68,3 @@ INSERT INTO `Reservation` (`reservationNo`, `customerId`, `transitLineId`, `orig
 (3, 3, 3, 4, 3, '2024-12-03 14:00:00', 0, 5),
 (4, 4, 4, 5, 2, '2024-12-04 16:00:00', 1, 20),
 (5, 5, 5, 1, 3, '2024-12-05 18:00:00', 1, 15);
-
-INSERT INTO `RViews` (`reservationNo`, `ssn`) VALUES
-(1, '987-65-4321'),
-(2, '456-78-9012'),
-(3, '654-32-1098'),
-(4, '987-65-4321'),
-(5, '456-78-9012');

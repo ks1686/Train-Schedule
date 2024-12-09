@@ -36,8 +36,8 @@ CREATE TABLE Stop (
     stopId INT AUTO_INCREMENT UNIQUE,
     stopStation INT,
     stopLine INT,
-    departureDateTime DATETIME,
-    arrivalDateTime DATETIME,
+    departureDateTime DATETIME NOT NULL,
+    arrivalDateTime DATETIME NOT NULL,
     PRIMARY KEY(stopId, stopStation, stopLine),
     FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
@@ -93,20 +93,6 @@ CREATE TABLE Answers (
     FOREIGN KEY (employeeSSN) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
--- Human to Transit --
--- Table: SViews
-CREATE TABLE SViews (
-    ssn CHAR(11),
-    stopId INT NOT NULL,
-    stopStation INT NOT NULL,
-    stopLine INT NOT NULL,
-    PRIMARY KEY (ssn, stopId, stopStation, stopLine),
-    FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (stopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 -- Table: Reservation
 CREATE TABLE Reservation (
     reservationNo INT AUTO_INCREMENT PRIMARY KEY,
@@ -122,15 +108,3 @@ CREATE TABLE Reservation (
     FOREIGN KEY (originStopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (destinationStopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE
 );
-
--- Table: RViews
-CREATE TABLE RViews (
-    reservationNo INT,
-    ssn CHAR(11),
-    PRIMARY KEY (reservationNo, ssn),
-    FOREIGN KEY (reservationNo) REFERENCES Reservation(reservationNo) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (ssn) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Index for Searching based on Question
-CREATE FULLTEXT INDEX idx_questionText ON Questions (questionText);

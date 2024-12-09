@@ -385,7 +385,7 @@
 <div class="main-container">
     <div class="top-half">
         <div class="customer-header">
-            <p>Customer List By Transit and Date:</p>
+            <p>Customer List By Transit and Reservation Booking Date:</p>
         </div>
 		<div class="search-container">
 		                <form method="GET" action="repWelcome.jsp">

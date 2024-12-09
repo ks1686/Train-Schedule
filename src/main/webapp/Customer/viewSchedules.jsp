@@ -212,7 +212,7 @@
         
         while (rs3.next()) {
         	int lineId = rs3.getInt("LineId");
-        	if (scheduleRes.containsKey(lineId)) {
+        	if (scheduleRes.containsKey(lineId)) {        	
         		scheduleRes.get(lineId).addStop(rs3.getInt("StopId"), rs3.getInt("StationId"), rs3.getString("StationName"), rs3.getString("StationCity"), rs3.getString("StationState"), rs3.getString("ArrivalDateTime"), rs3.getString("DepartureDateTime"));
         	}
         }
