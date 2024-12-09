@@ -48,7 +48,56 @@
             justify-content: flex-start;
             align-items: center;
         }
+        
+		.search-container input[type="text"] {
+            padding: 8px 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 260px;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
 
+        .search-container input[type="submit"] {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        
+       	.clear-button {
+            padding: 8px 16px;
+            background-color: #228c22;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .clear-button:hover {
+            background-color: #228222;
+        }
+        
+        .clear-button button {
+            background-color: transparent;
+		    background-repeat: no-repeat;
+		    border: none;
+		    cursor: pointer;
+		    overflow: hidden;
+		    outline: none;
+            color: white;
+	    }
+		        
         .logout-button {
             padding: 8px 16px;
             background-color: #f44336;
@@ -96,7 +145,14 @@
         .label-bold {
             font-weight: bold;
         }
-
+       
+        .reserve-button {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -250,7 +306,7 @@
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
-    <form method="POST" action="customerWelcome.jsp">
+    <form class="clear-button" method="POST" action="customerWelcome.jsp">
     	<button name="clear">Clear And Go Back</button>
     </form>
     <a href="../logout.jsp" class="logout-button">Logout</a>
@@ -263,34 +319,37 @@
 <div class="main-container">
 	<!--  book reservations  -->
 	<h3>View Alternate Schedules</h3>
-	<form method="POST" action="viewSchedules.jsp" style="display: inline">
-		<label>Origin: </label>
-		<select name="originStationId" required>
-			<option value=""></option>
-			<% for (Station station : uniqueStations) { %>
-				<option value="<%= station.getStationId() %>"
-				<%= station.getStationId() == Integer.valueOf(originStationId) ? "selected" : "" %>>
-					<%= station.toString() %>
-				</option>
-			<% } %>
-		</select>
-		
-		<label>Destination: </label>
-		<select name="destinationStationId" required>
-			<option value=""></option>
-			<% for (Station station : uniqueStations) { %>
-				<option value="<%= station.getStationId() %>"
-				<%= station.getStationId() == Integer.valueOf(destinationStationId) ? "selected" : "" %>>
-					<%= station.toString() %>
-				</option>
-			<% } %>
-		</select>
-		
-		<label>Date of Departure: </label>	            
-           <input type="date" name="reservationDate" required value="<%= reservationDate %>">
-		
-		<button type="submit">View Schedules</button>
-	</form>
+	
+    <div class="search-container">
+		<form method="POST" action="viewSchedules.jsp" style="display: inline">
+			<label>Origin: </label>
+			<select name="originStationId" required>
+				<option value=""></option>
+				<% for (Station station : uniqueStations) { %>
+					<option value="<%= station.getStationId() %>"
+					<%= station.getStationId() == Integer.valueOf(originStationId) ? "selected" : "" %>>
+						<%= station.toString() %>
+					</option>
+				<% } %>
+			</select>
+			
+			<label>Destination: </label>
+			<select name="destinationStationId" required>
+				<option value=""></option>
+				<% for (Station station : uniqueStations) { %>
+					<option value="<%= station.getStationId() %>"
+					<%= station.getStationId() == Integer.valueOf(destinationStationId) ? "selected" : "" %>>
+						<%= station.toString() %>
+					</option>
+				<% } %>
+			</select>
+			
+			<label>Date of Departure: </label>	            
+	           <input type="date" name="reservationDate" required value="<%= reservationDate %>">
+			
+            <input type="submit" value="View Schedules" />
+		</form>
+	</div>
 	
 	<div class="table-container">
 	<h3>Book Reservation</h3>
@@ -390,7 +449,7 @@
                    <td>
 	                <form action="confirmReservation.jsp" method="POST" style="display: inline">	                	
 	                	<input type="hidden" name="reserve" value="<%= lineId %>">
-					    <button type="submit">Reserve</button>
+					    <button type="submit" class="reserve-button">Reserve</button>
 					</form>
                    </td>
                </tr>

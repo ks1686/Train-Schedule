@@ -27,7 +27,7 @@
         .header {
             background-color: #4CAF50;
             color: white;
-            padding: 0px 20px;
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -43,12 +43,8 @@
             display: flex;
             flex-direction: column;
             height: 100%;
-            padding: 50px;
+            padding: 20px;
             flex-grow: 1;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow-y: visible;
         }
 
         .form-container {
@@ -109,7 +105,32 @@
         .form-container textarea {
             font-size: 14px;
         }
-
+        
+       	.clear-button {
+            padding: 8px 16px;
+            background-color: #228c22;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .clear-button:hover {
+            background-color: #228222;
+        }
+        
+        .clear-button button {
+            background-color: transparent;
+		    background-repeat: no-repeat;
+		    border: none;
+		    cursor: pointer;
+		    overflow: hidden;
+		    outline: none;
+            color: white;
+	    }
+	    
         .logout-button {
             padding: 8px 16px;
             background-color: #f44336;
@@ -223,8 +244,9 @@
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
-    
-	<h3>Speak to a Representative</h3>
+    <form class="clear-button" method="POST" action="customerWelcome.jsp">
+    	<button name="clear">Clear And Go Back</button>
+    </form>
     <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
@@ -234,6 +256,7 @@
 
 <div class="main-container">
     <div class="bottom-half">	        
+		<h2>Speak to a Representative</h2>   
         <div class="form-container">
             <h3>Ask a New Question:</h3>
             <form method="POST" action="askQuestion.jsp">

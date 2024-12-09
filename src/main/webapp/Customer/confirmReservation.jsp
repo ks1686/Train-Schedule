@@ -67,6 +67,31 @@
 		    align-items: center;
         }
 
+       	.clear-button {
+            padding: 8px 16px;
+            background-color: #228c22;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .clear-button:hover {
+            background-color: #228222;
+        }
+        
+        .clear-button button {
+            background-color: transparent;
+		    background-repeat: no-repeat;
+		    border: none;
+		    cursor: pointer;
+		    overflow: hidden;
+		    outline: none;
+            color: white;
+	    }
+
         .logout-button {
             padding: 8px 16px;
             background-color: #f44336;
@@ -115,6 +140,31 @@
             font-weight: bold;
         }
 
+        .reserve-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .finalizeForm {
+        	width: 100%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .info-text {
+        	color: gray;
+        	font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -142,7 +192,7 @@
 
 <div class="header">
     <div class="username">Hello, <%= username %>!</div>
-    <form method="POST" action="viewSchedules.jsp">
+    <form class="clear-button" method="POST" action="viewSchedules.jsp">
     	<button name="clear">Clear And Go Back</button>
     </form>
     <a href="../logout.jsp" class="logout-button">Logout</a>
@@ -181,47 +231,51 @@
 	    </table>
 	</div>
 	
+	<br>
     <details>
         <summary>View Stops</summary>
-        <table>
-        <thead>
-            <tr>
-                <th>Station</th>
-                <th>Arrival Time</th>
-                <th>Departure Time</th>
-                <th>Estimated Fare</th>
-            </tr>
-        </thead>
-        <tbody>
-            <%
-            List<Object[]> lineStops = sched.getStops();
-            for (int ii = 0; ii < lineStops.size(); ii++) {
-                Object[] stop = lineStops.get(ii);
-                String stationName = stop[1].toString();
-                String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
-                String color = (String) stop[4];
-                boolean bold = (boolean) stop[5];
-                
-                float estimatedFare = sched.getEstimatedFare(ii);
-                String estFareStr = String.format("$%.2f", estimatedFare);
-                if (estimatedFare == -1) estFareStr = "N/A";
-                
-                if (bold) {
-                    stationName = "<b>" + stationName + "</b>";
-                    arrivalTime = "<b>" + arrivalTime + "</b>";
-                    departureTime = "<b>" + departureTime + "</b>";
-                    estFareStr = "<b>" + estFareStr + "</b>";
-                }
-            %>
-            <tr>
-                <td style="color:<%= color %>"><%= stationName %></td>
-                <td style="color:<%= color %>"><%= arrivalTime %></td>
-                <td style="color:<%= color %>"><%= departureTime %></td>
-                <td style="color:<%= color %>"><%= estFareStr %></td>
-            </tr>
-        <% } %>
-        </tbody>
-        </table>
+        
+		<div class="table-container">
+	        <table class="reservation-table">
+	        <thead>
+	            <tr>
+	                <th>Station</th>
+	                <th>Arrival Time</th>
+	                <th>Departure Time</th>
+	                <th>Estimated Fare</th>
+	            </tr>
+	        </thead>
+	        <tbody>
+	            <%
+	            List<Object[]> lineStops = sched.getStops();
+	            for (int ii = 0; ii < lineStops.size(); ii++) {
+	                Object[] stop = lineStops.get(ii);
+	                String stationName = stop[1].toString();
+	                String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
+	                String color = (String) stop[4];
+	                boolean bold = (boolean) stop[5];
+	                
+	                float estimatedFare = sched.getEstimatedFare(ii);
+	                String estFareStr = String.format("$%.2f", estimatedFare);
+	                if (estimatedFare == -1) estFareStr = "N/A";
+	                
+	                if (bold) {
+	                    stationName = "<b>" + stationName + "</b>";
+	                    arrivalTime = "<b>" + arrivalTime + "</b>";
+	                    departureTime = "<b>" + departureTime + "</b>";
+	                    estFareStr = "<b>" + estFareStr + "</b>";
+	                }
+	            %>
+	            <tr>
+	                <td style="color:<%= color %>"><%= stationName %></td>
+	                <td style="color:<%= color %>"><%= arrivalTime %></td>
+	                <td style="color:<%= color %>"><%= departureTime %></td>
+	                <td style="color:<%= color %>"><%= estFareStr %></td>
+	            </tr>
+	        <% } %>
+	        </tbody>
+	        </table>
+        </div>
     </details>    
     
     
@@ -231,7 +285,7 @@
    	<details>
    		<summary>Discounts Available</summary>
    		<p>Discounts don't stack! (eg. A child with a disability will have a 50% discount)
-	   	<table>
+	   	<table class="reservation-table">
 	   		<thead>
 	   			<tr>
 	   				<th>Status</th>
@@ -254,33 +308,35 @@
 	   	</table>
    	</details>
    	<br>
-    <form method="POST" action="placeReservation.jsp">
-    	<input type="hidden" name="reserve" value="<%= lineId %>">
-    
-    	<label>Trip Type:</label>
-        <label>
-    		<input type="radio" name="tripType" value="oneway" required>One Way
-    	</label>
-    	<label>
-    		<input type="radio" name="tripType" value="round" required>Round Trip
-    	</label>
-    	<label style="color:gray">(return fare for round trip is same as departure - total price 2x final price)<br></label>
-    	
-    	<label>Age:</label>
-    	<input type="number" name="age" placeholder="Age" required min="0" />
-    	<label style="color:gray">(discount applicable for children 12 and under or seniors 65 and over)<br></label>
-    	
-       	<label>Do you have a disability?</label>
-       	<label>
-    		<input type="radio" name="disability" value="yes" required>Yes
-    	</label>
-    	<label>
-    		<input type="radio" name="disability" value="no" required>No
-    	</label>
-    	
-    	<br>
-		<input type="submit" value="Reserve" />
-    </form>
+   	<div class="finalizeForm">
+	    <form method="POST" action="placeReservation.jsp">
+	    	<input type="hidden" name="reserve" value="<%= lineId %>">
+	    
+	    	<label>Trip Type:</label>
+	        <label>
+	    		<input type="radio" name="tripType" value="oneway" required>One Way
+	    	</label>
+	    	<label>
+	    		<input type="radio" name="tripType" value="round" required>Round Trip
+	    	</label>
+	    	<label class="info-text"><br>(return fare for round trip is same as departure - total price 2x final price)<br><br></label>
+	    	
+	    	<label>Age:</label>
+	    	<input type="number" name="age" placeholder="Age" required min="0" />
+	    	<label class="info-text"><br>(discount applicable for children 12 and under or seniors 65 and over)<br><br></label>
+	    	
+	       	<label>Do you have a disability?</label>
+	       	<label>
+	    		<input type="radio" name="disability" value="yes" required>Yes
+	    	</label>
+	    	<label>
+	    		<input type="radio" name="disability" value="no" required>No
+	    	</label>
+	    	
+	    	<br><br>
+			<input type="submit" value="Reserve" class="reserve-button"/>
+	    </form>
+    </div>
 </div>
 
 </body>

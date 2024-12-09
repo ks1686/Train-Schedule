@@ -56,15 +56,64 @@
             height: 100vh;
             overflow-y: visible;
         }
+        
+		table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th, td {
+            padding: 8px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+		tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
 
         .bottom-half {
-            flex: 1;
+            flex: 0.5;
             overflow-y: visible;
             margin-top: 20px;
 			display: block;
 			margin: auto;
 		    justify-content: center;
 		    align-items: center;
+        }
+        
+        .search-container input[type="text"] {
+            padding: 8px 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 260px;
+            margin-bottom: 5px;
+            box-sizing: border-box;
+        }
+
+        .search-container input[type="submit"] {
+            padding: 8px 16px;
+            font-size: 16px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-container input[type="submit"]:hover {
+            background-color: #45a049;
         }
 
         .logout-button {
@@ -86,6 +135,29 @@
             font-weight: bold;
         }
 
+        .cancel-reservation {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+        }
+
+        .viewQuestions {
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        .h3 {
+       	    font-size: 1.17em;
+		    font-weight: bold;
+		    margin-top: 1em; 
+		    margin-bottom: 1em;
+		    line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -250,28 +322,30 @@
     
 		<!--  book reservations  -->
 		<h3>Book Reservation</h3>
-		<form method="POST" action="viewSchedules.jsp" style="display: inline">
-			<label>Origin: </label>
-			<select name="originStationId" required>
-				<option value=""></option>
-				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
-				<% } %>
-			</select>
-			
-			<label>Destination: </label>
-			<select name="destinationStationId" required>
-				<option value=""></option>
-				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
-				<% } %>
-			</select>
-			
-			<label>Date of Departure: </label>	            
-            <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>">
-			
-			<button type="submit">View Schedules</button>
-		</form>
+        <div class="search-container">
+			<form method="POST" action="viewSchedules.jsp" style="display: inline">
+				<label>Origin: </label>
+				<select name="originStationId" required>
+					<option value=""></option>
+					<% for (Station station : uniqueStations) { %>
+						<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+					<% } %>
+				</select>
+				
+				<label>Destination: </label>
+				<select name="destinationStationId" required>
+					<option value=""></option>
+					<% for (Station station : uniqueStations) { %>
+						<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+					<% } %>
+				</select>
+				
+				<label>Date of Departure: </label>	            
+	            <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>">
+				
+	            <input type="submit" value="View Schedules" />
+			</form>
+		</div>
 		
 		<!--  view reservations  -->
 		<h3>Upcoming Reservations</h3>
@@ -333,7 +407,7 @@
 			                    <td>
 					                <form action="cancelReservation.jsp" method="POST" style="display:inline">	                	
 					                	<input type="hidden" name="cancel" value="<%= reservation.getReservationNo() %>">
-									    <button type="submit">Cancel</button>
+									    <button type="submit" class="cancel-reservation">Cancel</button>
 									</form>
 			                    </td>
 							</tr>
@@ -344,7 +418,7 @@
 		</div>
 		
 		<details>
-			<summary><h3>Past Reservations</h3></summary>
+			<summary class="h3">Past Reservations</summary>
 			
 			<div class="reservation-container">
 				<% if (pastReservations.isEmpty()) { %> 
