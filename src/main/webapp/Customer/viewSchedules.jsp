@@ -175,7 +175,7 @@
         
         
         // Get all transit lines that are operating on the user's provided stations and date
-        String query2 = "SELECT tl.lineId AS LineId, tl.lineName AS LineName, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
+        String query2 = "SELECT tl.lineId AS LineId, tl.lineName AS LineName, tl.trainId AS TrainId, s1.stationId AS OriginStationId, s1.name AS OriginStationName, s1.city AS OriginCity, s1.state AS OriginState, stop1.departureDateTime AS DepartureDateTime, " +
         				"s2.stationId AS DestinationStationId, s2.name AS DestinationStationName, s2.city AS DestinationCity, s2.state AS DestinationState, stop2.arrivalDateTime AS ArrivalDateTime, tl.fare AS Fare " +
 		        		"FROM Station s1 " +
 		        		"JOIN Stop stop1 ON s1.stationId = stop1.stopStation " +
@@ -193,7 +193,7 @@
         
         while (rs2.next()) {
         	int lineId = rs2.getInt("LineId");
-        	scheduleRes.put(lineId, new LineSchedule(lineId, rs2.getString("LineName"), 
+        	scheduleRes.put(lineId, new LineSchedule(lineId, rs2.getString("LineName"), rs2.getInt("TrainId"),
         			rs2.getInt("OriginStationId"), rs2.getString("OriginStationName"), rs2.getString("OriginCity"), rs2.getString("OriginState"), rs2.getString("DepartureDateTime"), 
         			rs2.getInt("DestinationStationId"), rs2.getString("DestinationStationName"), rs2.getString("DestinationCity"), rs2.getString("DestinationState"), rs2.getString("ArrivalDateTime"), 
         			rs2.getFloat("Fare")));
@@ -315,6 +315,7 @@
 		<table class="reservation-table">
         <thead>
             <tr>
+                <th>Train</th>
                 <th>Transit Line</th>
                 <th>Origin</th>
                 <th>Departure Time 
@@ -353,6 +354,7 @@
             	session.setAttribute("line: " + lineId, sched);
             %>
                 <tr>
+                    <td><%= sched.getTrainId() %></td>
                     <td><%= sched.getLineName() %></td>
                     <td><%= sched.getOrigin().toString() %></td>
                     <td><%= sched.getFormattedDepartureDateTime() %></td>

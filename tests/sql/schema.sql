@@ -10,25 +10,24 @@ CREATE TABLE Station (
     state CHAR(2)
 );
 
+-- Table: Train
+CREATE TABLE Train (
+    trainId INT CHECK (1000 <= trainId AND trainId <= 9999) PRIMARY KEY
+);
+
 -- Table: TransitLine
 CREATE TABLE TransitLine (
     lineId INT AUTO_INCREMENT PRIMARY KEY,
     lineName VARCHAR(50),
+    trainId INT NOT NULL,
     origin INT NOT NULL,
     destination INT NOT NULL,
     departureDateTime DATETIME,
     arrivalDateTime DATETIME,
     fare FLOAT,
+    FOREIGN KEY (trainId) REFERENCES Train(trainId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Table: Train
-CREATE TABLE Train (
-    trainId INT AUTO_INCREMENT PRIMARY KEY,
-    trainName VARCHAR(25),
-    lineId INT NOT NULL,
-    FOREIGN KEY (lineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Table: Stop

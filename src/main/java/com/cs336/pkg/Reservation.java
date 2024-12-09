@@ -16,6 +16,7 @@ public class Reservation {
 
 	private int transitLineId;
 	private String transitLineName;
+	private int trainId;
 	private float transitLineFare;
 
 	private float originalFare;
@@ -34,7 +35,7 @@ public class Reservation {
 	
 
 	// TODO: validate null inputs
-	public Reservation(int reservationNo, String reservationDateTime, boolean isRoundTrip, int discountRate, int customerId, String customerFirstName, String customerLastName, String customerEmail, int transitLineId, String transitLineName, float transitLineFare, 
+	public Reservation(int reservationNo, String reservationDateTime, boolean isRoundTrip, int discountRate, int customerId, String customerFirstName, String customerLastName, String customerEmail, int transitLineId, String transitLineName, int trainId, float transitLineFare, 
 						int reservationOriginStopId, int reservationOriginStationId, String reservationOriginStationName, String reservationOriginCity, String reservationOriginState, String originStationArrivalTime, String originStationDepartureTime,
 						int reservationDestinationStopId, int reservationDestinationStationId, String reservationDestinationStationName, String reservationDestinationCity, String reservationDestinationState, String destinationStationArrivalTime, String destinationStationDepartureTime) {
 		this.reservationNo = reservationNo;
@@ -49,6 +50,7 @@ public class Reservation {
 		
 		this.transitLineId = transitLineId;
 		this.transitLineName = transitLineName;
+		this.trainId = trainId;
 		this.transitLineFare = transitLineFare;
 		
 		this.originStopId = reservationOriginStopId;
@@ -94,6 +96,8 @@ public class Reservation {
 
 	public String getTransitLineName() { return transitLineName; }
 
+	public int getTrainId() { return trainId; }
+	
 	public float getTransitLineFare() { return transitLineFare; }
 
 	public float getOriginalFare() { return originalFare; }

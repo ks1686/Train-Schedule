@@ -1,16 +1,59 @@
-lineFormat = '''INSERT INTO TransitLine (lineName, origin, destination, departureDateTime, arrivalDateTime, fare)
+table = '''USE trains;'''
+
+clearTable = '''
+SET FOREIGN_KEY_CHECKS=0; 
+TRUNCATE TABLE Stop;
+TRUNCATE TABLE TransitLine;
+TRUNCATE TABLE Train;
+TRUNCATE TABLE Station;
+SET FOREIGN_KEY_CHECKS=1;'''
+
+src = '''
+-- source: https://www.njtransit.com/pdf/rail/r0070.pdf'''
+
+stationFormat = '''INSERT INTO Station (name, city, state)
+VALUES 
+    ("Trenton Transit Center", "Trenton", "NJ"),
+    ("Hamilton", "Hamilton", "NJ"),
+    ("Princeton Junction", "Princeton", "NJ"),
+    ("Jersey Avenue", "New Brunswick", "NJ"),
+    ("New Brunswick", "New Brunswick", "NJ"),
+    ("Edison", "Edison", "NJ"),
+    ("Metuchen", "Metuchen", "NJ"),
+    ("Metropark", "Iselin", "NJ"),
+    ("Rahway", "Rahway", "NJ"),
+    ("Linden", "Linden", "NJ"),
+    ("Elizabeth", "Elizabeth", "NJ"),
+    ("North Elizabeth", "Elizabeth", "NJ"),
+    ("Newark Int'l Airport", "Newark", "NJ"),
+    ("Newark Penn Station", "Newark", "NJ"),
+    ("Secaucus Junction", "Secaucus", "NJ"),
+    ("New York Penn Station", "New York", "NY");
+'''
+
+trainFormat = '''INSERT INTO Train (trainId)
+VALUES
+    (3818),
+    (3828),
+    (3830),
+    (3861),
+    (3725),
+    (3873);
+'''
+
+lineFormat = '''INSERT INTO TransitLine (lineName, trainId, origin, destination, departureDateTime, arrivalDateTime, fare)
 VALUES '''
 for i in range(0, 31):
     lineFormat += f'''        
     -- 2024-12-{(i+1):02d}
-    ("NJ Northeast Corridor 8AM", 1, 16, "2024-12-{(i+1):02d} 06:11", "2024-12-{(i+1):02d} 07:50", 80.00),
-    ("NJ Northeast Corridor 9AM", 1, 16, "2024-12-{(i+1):02d} 07:23", "2024-12-{(i+1):02d} 09:06", 100.00),
-    ("NJ Northeast Corridor 10AM", 1, 16, "2024-12-{(i+1):02d} 08:00", "2024-12-{(i+1):02d} 09:37", 100.00),
-    ("NJ Northeast Corridor 4PM", 16, 1, "2024-12-{(i+1):02d} 16:30", "2024-12-{(i+1):02d} 18:04", 100.00),
-    ("NJ Northeast Corridor 5PM", 16, 4, "2024-12-{(i+1):02d} 17:08", "2024-12-{(i+1):02d} 18:13", 90.00),
-    ("NJ Northeast Corridor 6PM", 16, 1, "2024-12-{(i+1):02d} 18:14", "2024-12-{(i+1):02d} 19:43", 80.00),
+    ("NJ Northeast Corridor 8AM", 3818, 1, 16, "2024-12-{(i+1):02d} 06:11", "2024-12-{(i+1):02d} 07:50", 80.00),
+    ("NJ Northeast Corridor 9AM", 3828, 1, 16, "2024-12-{(i+1):02d} 07:23", "2024-12-{(i+1):02d} 09:06", 100.00),
+    ("NJ Northeast Corridor 10AM", 3830, 1, 16, "2024-12-{(i+1):02d} 08:00", "2024-12-{(i+1):02d} 09:37", 100.00),
+    ("NJ Northeast Corridor 4PM", 3861, 16, 1, "2024-12-{(i+1):02d} 16:30", "2024-12-{(i+1):02d} 18:04", 100.00),
+    ("NJ Northeast Corridor 5PM", 3725, 16, 4, "2024-12-{(i+1):02d} 17:08", "2024-12-{(i+1):02d} 18:13", 90.00),
+    ("NJ Northeast Corridor 6PM", 3873, 16, 1, "2024-12-{(i+1):02d} 18:14", "2024-12-{(i+1):02d} 19:43", 80.00),
     '''
-lineFormat = lineFormat[:-6] + ';'
+lineFormat = lineFormat[:-6] + ';\n'
 
 
 stopFormat = '''INSERT INTO Stop (stopStation, stopLine, departureDateTime, arrivalDateTime)
@@ -113,7 +156,11 @@ for i in range(0, 31):
     '''
 stopFormat = stopFormat[:-6] + ';'
 
-with open('./out.txt', 'w') as f:
+with open('tests/sql/mock_transit.sql', 'w') as f:
+    print(table, file=f)
+    print(clearTable, file=f)
+    print(src, file=f)
+    print(stationFormat, file=f)
+    print(trainFormat, file=f)
     print(lineFormat, file=f)
-    print(file=f)
     print(stopFormat, file=f)
