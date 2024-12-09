@@ -205,7 +205,8 @@
         String query3 = "SELECT tl.lineId AS LineId, stop.stopId as StopId, s.stationId AS StationId, s.name AS StationName, s.city AS StationCity, s.state AS StationState, stop.arrivalDateTime AS ArrivalDateTime, stop.departureDateTime AS DepartureDateTime " + 
 		        		"FROM TransitLine tl " +
 		        		"JOIN Stop stop ON tl.lineId = stop.stopLine " +
-		        		"JOIN Station s ON stop.stopStation = s.stationId";
+		        		"JOIN Station s ON stop.stopStation = s.stationId " +
+		        		"ORDER BY DepartureDateTime ASC";
         
         ps3 = conn.prepareStatement(query3);
         rs3 = ps3.executeQuery();
