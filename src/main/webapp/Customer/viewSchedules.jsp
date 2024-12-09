@@ -45,26 +45,8 @@
             height: 100%;
             padding: 20px;
             flex-grow: 1;
-        }
-
-        .top-half {
-            flex: 6;
-            display: flex;
-            flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            height: 100vh;
-            overflow-y: visible;
-        }
-
-        .bottom-half {
-            flex: 1;
-            overflow-y: visible;
-            margin-top: 20px;
-			display: block;
-			margin: auto;
-		    justify-content: center;
-		    align-items: center;
         }
 
         .logout-button {
@@ -279,155 +261,146 @@
 <% } %>
 
 <div class="main-container">
-    <div class="top-half">
-		<!--  book reservations  -->
-		<h3>View Alternate Schedules</h3>
-		<form method="POST" action="viewSchedules.jsp" style="display: inline">
-			<label>Origin: </label>
-			<select name="originStationId" required>
-				<option value=""></option>
-				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"
-					<%= station.getStationId() == Integer.valueOf(originStationId) ? "selected" : "" %>>
-						<%= station.toString() %>
-					</option>
-				<% } %>
-			</select>
-			
-			<label>Destination: </label>
-			<select name="destinationStationId" required>
-				<option value=""></option>
-				<% for (Station station : uniqueStations) { %>
-					<option value="<%= station.getStationId() %>"
-					<%= station.getStationId() == Integer.valueOf(destinationStationId) ? "selected" : "" %>>
-						<%= station.toString() %>
-					</option>
-				<% } %>
-			</select>
-			
-			<label>Date of Departure: </label>	            
-            <input type="date" name="reservationDate" required value="<%= reservationDate %>">
-			
-			<button type="submit">View Schedules</button>
-		</form>
+	<!--  book reservations  -->
+	<h3>View Alternate Schedules</h3>
+	<form method="POST" action="viewSchedules.jsp" style="display: inline">
+		<label>Origin: </label>
+		<select name="originStationId" required>
+			<option value=""></option>
+			<% for (Station station : uniqueStations) { %>
+				<option value="<%= station.getStationId() %>"
+				<%= station.getStationId() == Integer.valueOf(originStationId) ? "selected" : "" %>>
+					<%= station.toString() %>
+				</option>
+			<% } %>
+		</select>
 		
-		<div class="table-container">
-		<h3>Book Reservation</h3>
-		<table class="reservation-table">
-        <thead>
-            <tr>
-                <th>Train</th>
-                <th>Transit Line</th>
-                <th>Origin</th>
-                <th>Departure Time 
-	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
-	                	<input type="hidden" name="departureTimeSort" value="<%= departureTimeSort.equals("asc") ? "desc" : "asc" %>">
-					    <button type="submit">
-					        <%= departureTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
-					    </button>
-					</form>
-				</th>
-                <th>Destination</th>
-                <th>Arrival Time 
-	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
-	                	<input type="hidden" name="arrivalTimeSort" value="<%= arrivalTimeSort.equals("asc") ? "desc" : "asc" %>">
-					    <button type="submit">
-					        <%= arrivalTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
-					    </button>
-					</form>
-				</th>
-                <th>Path</th>
-                <th>Fare 
-	                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
-	                	<input type="hidden" name="fareSort" value="<%= fareSort.equals("asc") ? "desc" : "asc" %>">
-					    <button type="submit">
-					        <%= fareSort.equals("asc") ? "&#9650;" : "&#9660;" %>
-					    </button>
-					</form>
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            <%            
-            for (Integer lineId : keyOrder) { 
-            	LineSchedule sched = scheduleRes.get(lineId);
-            	session.setAttribute("line: " + lineId, sched);
-            %>
-                <tr>
-                    <td><%= sched.getTrainId() %></td>
-                    <td><%= sched.getLineName() %></td>
-                    <td><%= sched.getOrigin().toString() %></td>
-                    <td><%= sched.getFormattedDepartureDateTime() %></td>
-                    <td><%= sched.getDestination().toString() %></td>
-                    <td><%= sched.getFormattedArrivalDateTime() %></td>
-                    <td>
-                    	<details>
-                    		<summary>View Stops</summary>
-                    		<table>
-                    		<thead>
+		<label>Destination: </label>
+		<select name="destinationStationId" required>
+			<option value=""></option>
+			<% for (Station station : uniqueStations) { %>
+				<option value="<%= station.getStationId() %>"
+				<%= station.getStationId() == Integer.valueOf(destinationStationId) ? "selected" : "" %>>
+					<%= station.toString() %>
+				</option>
+			<% } %>
+		</select>
+		
+		<label>Date of Departure: </label>	            
+           <input type="date" name="reservationDate" required value="<%= reservationDate %>">
+		
+		<button type="submit">View Schedules</button>
+	</form>
+	
+	<div class="table-container">
+	<h3>Book Reservation</h3>
+	<table class="reservation-table">
+       <thead>
+           <tr>
+               <th>Train</th>
+               <th>Transit Line</th>
+               <th>Origin</th>
+               <th>Departure Time 
+                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+                	<input type="hidden" name="departureTimeSort" value="<%= departureTimeSort.equals("asc") ? "desc" : "asc" %>">
+				    <button type="submit">
+				        <%= departureTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+				    </button>
+				</form>
+			</th>
+               <th>Destination</th>
+               <th>Arrival Time 
+                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+                	<input type="hidden" name="arrivalTimeSort" value="<%= arrivalTimeSort.equals("asc") ? "desc" : "asc" %>">
+				    <button type="submit">
+				        <%= arrivalTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+				    </button>
+				</form>
+			</th>
+               <th>Path</th>
+               <th>Fare 
+                <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
+                	<input type="hidden" name="fareSort" value="<%= fareSort.equals("asc") ? "desc" : "asc" %>">
+				    <button type="submit">
+				        <%= fareSort.equals("asc") ? "&#9650;" : "&#9660;" %>
+				    </button>
+				</form>
+               </th>
+               <th></th>
+           </tr>
+       </thead>
+       <tbody>
+           <%            
+           for (Integer lineId : keyOrder) { 
+           	LineSchedule sched = scheduleRes.get(lineId);
+           	session.setAttribute("line: " + lineId, sched);
+           %>
+               <tr>
+                   <td><%= sched.getTrainId() %></td>
+                   <td><%= sched.getLineName() %></td>
+                   <td><%= sched.getOrigin().toString() %></td>
+                   <td><%= sched.getFormattedDepartureDateTime() %></td>
+                   <td><%= sched.getDestination().toString() %></td>
+                   <td><%= sched.getFormattedArrivalDateTime() %></td>
+                   <td>
+                   	<details>
+                   		<summary>View Stops</summary>
+                   		<table>
+                   		<thead>
+                   			<tr>
+                   				<th>Station</th>
+                   				<th>Arrival Time</th>
+                   				<th>Departure Time</th>
+                   				<th>Estimated Fare</th>
+                   			</tr>
+                   		</thead>
+                   		<tbody>
+                   			<%
+                   			List<Object[]> lineStops = sched.getStops();
+                   			for (int ii = 0; ii < lineStops.size(); ii++) {
+                   				Object[] stop = lineStops.get(ii);
+                   				String stationName = stop[1].toString();
+                   				String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
+                   				String color = (String) stop[4];
+                   				boolean bold = (boolean) stop[5];
+                   				
+                   				float estimatedFare = sched.getEstimatedFare(ii);
+                   				String estFareStr = String.format("$%.2f", estimatedFare);
+                   				if (estimatedFare == -1) estFareStr = "N/A";
+                   				
+                   				if (bold) {
+                   					stationName = "<b>" + stationName + "</b>";
+                   					arrivalTime = "<b>" + arrivalTime + "</b>";
+                   					departureTime = "<b>" + departureTime + "</b>";
+                   					estFareStr = "<b>" + estFareStr + "</b>";
+                   				}
+                   			%>
                     			<tr>
-                    				<th>Station</th>
-                    				<th>Arrival Time</th>
-                    				<th>Departure Time</th>
-                    				<th>Estimated Fare</th>
+                    				<td style="color:<%= color %>"><%= stationName %></td>
+                    				<td style="color:<%= color %>"><%= arrivalTime %></td>
+                    				<td style="color:<%= color %>"><%= departureTime %></td>
+                    				<td style="color:<%= color %>"><%= estFareStr %></td>
                     			</tr>
-                    		</thead>
-                    		<tbody>
-                    			<%
-                    			List<Object[]> lineStops = sched.getStops();
-                    			for (int ii = 0; ii < lineStops.size(); ii++) {
-                    				Object[] stop = lineStops.get(ii);
-                    				String stationName = stop[1].toString();
-                    				String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
-                    				String color = (String) stop[4];
-                    				boolean bold = (boolean) stop[5];
-                    				
-                    				float estimatedFare = sched.getEstimatedFare(ii);
-                    				String estFareStr = String.format("$%.2f", estimatedFare);
-                    				if (estimatedFare == -1) estFareStr = "N/A";
-                    				
-                    				if (bold) {
-                    					stationName = "<b>" + stationName + "</b>";
-                    					arrivalTime = "<b>" + arrivalTime + "</b>";
-                    					departureTime = "<b>" + departureTime + "</b>";
-                    					estFareStr = "<b>" + estFareStr + "</b>";
-                    				}
-                    			%>
-	                    			<tr>
-	                    				<td style="color:<%= color %>"><%= stationName %></td>
-	                    				<td style="color:<%= color %>"><%= arrivalTime %></td>
-	                    				<td style="color:<%= color %>"><%= departureTime %></td>
-	                    				<td style="color:<%= color %>"><%= estFareStr %></td>
-	                    			</tr>
-	                    		<% } %>
-                    		</tbody>
-                    		</table>
-                    	</details>
-                    </td>
-                    <td>$<%= String.format("%.02f", sched.getEstimatedFare()) %></td>
-                    <td>
-		                <form action="confirmReservation.jsp" method="POST" style="display: inline">	                	
-		                	<input type="hidden" name="reserve" value="<%= lineId %>">
-						    <button type="submit">Reserve</button>
-						</form>
-                    </td>
-                </tr>
-            <% } %>
-        </tbody>      
-	    </table>
-        <% if (scheduleRes.isEmpty()) { %>
-        	<p style="color: red">No valid schedules.</p>            
-        <% } %>
-        </div>
-    </div>
- 
-
-    <div class="bottom-half">	        
-		<form method="POST" action="askQuestion.jsp" style="display: inline">
-			<button type="submit" class="viewQuestions">Speak with a Representative</button>
-		</form>
-    </div>
+                    		<% } %>
+                   		</tbody>
+                   		</table>
+                   	</details>
+                   </td>
+                   <td>$<%= String.format("%.02f", sched.getEstimatedFare()) %></td>
+                   <td>
+	                <form action="confirmReservation.jsp" method="POST" style="display: inline">	                	
+	                	<input type="hidden" name="reserve" value="<%= lineId %>">
+					    <button type="submit">Reserve</button>
+					</form>
+                   </td>
+               </tr>
+           <% } %>
+       </tbody>      
+    </table>
+       <% if (scheduleRes.isEmpty()) { %>
+       	<p style="color: red">No valid schedules.</p>            
+       <% } %>
+       </div>
 </div>
 
 </body>
