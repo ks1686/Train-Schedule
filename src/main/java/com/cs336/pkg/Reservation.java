@@ -142,6 +142,10 @@ public class Reservation {
 				"Customer Last Name: " + customerLastName + "\n" +
 				"Customer Email: " + customerEmail + "\n" +
 				"Transit Line ID: " + transitLineId + "\n" +
-				"Transit Line Name: " + transitLineName + "\n";
+				"Transit Line Name: " + transitLineName + "\n" + 
+				"Transit Line Fare: " + transitLineFare + "\n" + 
+				"Total Original Fare: " + originalFare + "\n" + 
+				"Customer Discount: " + customerDiscount + "\n" + 
+				"Customer Fare: " + customerFare + "\n";
 	}
 }

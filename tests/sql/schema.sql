@@ -117,6 +117,7 @@ CREATE TABLE Reservation (
     reservationDateTime DATETIME NOT NULL,
     isRoundTrip BOOLEAN NOT NULL,
     discount INT CHECK (discount <= 100) NOT NULL,
+    totalFare FLOAT CHECK (totalFare >= 0) NOT NULL,
     FOREIGN KEY (customerId) REFERENCES Customer(customerId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (transitLineId) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (originStopId) REFERENCES Stop(stopId) ON DELETE CASCADE ON UPDATE CASCADE,

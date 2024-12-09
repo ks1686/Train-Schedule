@@ -134,7 +134,7 @@
             
         String reservationQuery = 	"SELECT r.reservationNo, r.reservationDateTime, r.isRoundTrip, r.discount, " +
         							"c.customerId, c.firstName AS customerFirstName, c.lastName AS customerLastName, c.email AS customerEmail, " + 
-        							"tl.lineId AS transitLineId, tl.lineName AS transitLineName, tl.fare AS transitLineFare, " + 
+        							"tl.lineId AS transitLineId, tl.lineName AS transitLineName, r.totalFare AS transitLineFare, " + 
         							"r.originStopId AS reservationOriginStopId, s1.stopStation AS reservationOriginStationId, rs1.name AS reservationOriginStationName, " + 
         							"rs1.city AS reservationOriginCity, rs1.state AS reservationOriginState, s1.departureDateTime AS originStationDepartureTime, s1.arrivalDateTime AS originStationArrivalTime, " + 
         							"r.destinationStopId AS reservationDestinationStopId, s2.stopStation AS reservationDestinationStationId, rs2.name AS reservationDestinationStationName, " + 
