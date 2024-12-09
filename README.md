@@ -5,7 +5,13 @@
 This project is a Train Reservation System that allows customers to make reservations for train journeys, employees to manage customer queries, and managers to oversee operations. The system is built using Java and SQL.
 
 ### Entity Relation Diagram (ERD)
-![Entity Relation Diagram (ERD)](er_diagram-v3.png)
+<p align="center">
+    <picture>
+      <source media="(prefers-color-scheme: light)" srcset="assets/er_diagram-v3_light.png">
+      <source media="(prefers-color-scheme: dark)" srcset="assets/er_diagram-v3_dark.png">
+      <img alt="Entity Relation Diagram (ERD)" src="assets/er_diagram-v3_dark.png">
+    </picture>
+</p>
 
 ## Functionality
 
@@ -97,9 +103,7 @@ All functionality from the checklist has been implemented.
 │   │   ├── Dump20241209.sql
 │   │   ├── table_data.sql
 │   │   └── schema.sql
-│   ├── buildMockTransit.py
-│   └── mock_transit.png
-├── er_diagram-v3.png
+│   └──  buildMockTransit.py
 └── README.md
 ```
 
@@ -109,6 +113,8 @@ All functionality from the checklist has been implemented.
 - `tests/sql/schema.sql`: SQL script for creating the database schema.
 - `tests/buildMockTransit.py`: Builds `./sql/table_data.sql` with appropriate data.
 - `tests/mock_transit.png`: Visual representation of NJ Transit lines, used as a reference for generating mock transit data.
+  - ![Mock Transit Line Source](assets/mock_transit.png)
+
 
 ### Testing Credentials
 
