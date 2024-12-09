@@ -211,6 +211,7 @@
             employee.put("firstName", rs.getString("firstName"));
             employee.put("lastName", rs.getString("lastName"));
             employee.put("username", rs.getString("username"));
+            employee.put("password", rs.getString("password"));
             employee.put("role", rs.getString("role"));
             employees.add(employee);
         }
@@ -281,6 +282,7 @@
                             <!-- Edit and Delete buttons -->
                             <form method="POST" action="editEmployee.jsp" style="display: inline;">
                                 <input type="hidden" name="username" value="<%= employee.get("username") %>">
+                                <input type="hidden" name="password" value="<%= employee.get("password") %>">
                                 <input type="hidden" name="ssn" value="<%= employee.get("ssn") %>">
                                 <input type="hidden" name="firstName" value="<%= employee.get("firstName") %>">
                                 <input type="hidden" name="lastName" value="<%= employee.get("lastName") %>">

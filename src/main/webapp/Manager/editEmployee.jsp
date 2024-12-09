@@ -103,7 +103,7 @@
         <input type="text" name="username" value="<%= username %>" required>
 
         <label for="password">Password:</label>
-        <input type="password" name="password" value="<%= password %>"placeholder="Enter new password" required>
+        <input type="text" name="password" value="<%= password %>" required>
 
         <label for="role">Role:</label>
         <select name="role" required>
