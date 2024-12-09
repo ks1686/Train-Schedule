@@ -4,6 +4,9 @@
 
 This project is a Train Reservation System that allows customers to make reservations for train journeys, employees to manage customer queries, and managers to oversee operations. The system is built using Java and SQL.
 
+### Entity Relation Diagram (ERD)
+![Entity Relation Diagram (ERD)](er_diagram-v3.png)
+
 ## Functionality
 
 All functionality from the checklist has been implemented.
@@ -96,6 +99,7 @@ All functionality from the checklist has been implemented.
 │   │   └── schema.sql
 │   ├── buildMockTransit.py
 │   └── mock_transit.png
+├── er_diagram-v3.png
 └── README.md
 ```
 
