@@ -18,10 +18,40 @@ This project is a Train Reservation System that allows customers to make reserva
 ├── src
 │   └── main
 │       └── java
-│           └── com
-│               └── cs336
-│                   └── pkg
-│                       └── ApplicationDB.java
+│           ├── com
+│           │   └── cs336
+│           │       └── pkg
+│           │           ├── DateTimeConversion.java
+│           │           ├── LineSchedule.java
+│           │           ├── Reservation.java
+│           │           ├── Station.java
+│           │           └── ApplicationDB.java
+│           └── webapp
+│               ├── Customer
+│               │   ├── askQuestion.jsp
+│               │   ├── cancelReservation.jsp
+│               │   ├── confirmReservation.jsp
+│               │   ├── customerWelcome.jsp
+│               │   ├── placeReservation
+│               │   └── viewSchedules.jsp
+│               ├── Manager
+│               │   ├── addEmployee.jsp
+│               │   ├── deleteEmployee.jsp
+│               │   ├── editEmployee.jsp
+│               │   ├── getReservations.jsp
+│               │   ├── getRevenue.jsp
+│               │   ├── getSalesReport.jsp
+│               │   ├── managerWelcome.jsp
+│               │   └── updateEmployee.jsp
+│               ├── Representative
+│               │   ├── deleteSchedule.jsp
+│               │   ├── repWelcome.jsp
+│               │   ├── updateSchedule.jsp
+│               │   └── viewStops.jsp
+│               ├── 403.jsp
+│               ├── login.jsp
+│               │── logout.jsp
+│               └── register.jsp
 ├── tests
 │   └── sql
 │       ├── mock_transit.sql
