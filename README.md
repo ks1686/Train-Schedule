@@ -40,6 +40,7 @@ This project is a Train Reservation System that allows customers to make reserva
 1. **Set Up the Database**:
     - Ensure MySQL is installed and running on your machine.
     - Create the database and tables by running the respective scripts or using the command line.
+    - Make sure JDBC is installed and configured on your machine.
 
 2. **Configure Database Connection**:
     - Update the `DB_USER` and `DB_PASSWORD` in `ApplicationDB.java` with your MySQL credentials.
