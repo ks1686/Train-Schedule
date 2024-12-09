@@ -1,47 +1,6 @@
 CREATE DATABASE trains;
 USE trains;
 
--- Transit --
--- Table: Station
-CREATE TABLE Station (
-    stationId INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50),
-    city VARCHAR(20),
-    state CHAR(2)
-);
-
--- Table: Train
-CREATE TABLE Train (
-    trainId INT CHECK (1000 <= trainId AND trainId <= 9999) PRIMARY KEY
-);
-
--- Table: TransitLine
-CREATE TABLE TransitLine (
-    lineId INT AUTO_INCREMENT PRIMARY KEY,
-    lineName VARCHAR(50),
-    trainId INT NOT NULL,
-    origin INT NOT NULL,
-    destination INT NOT NULL,
-    departureDateTime DATETIME,
-    arrivalDateTime DATETIME,
-    fare FLOAT,
-    FOREIGN KEY (trainId) REFERENCES Train(trainId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
--- Table: Stop
-CREATE TABLE Stop (
-    stopId INT AUTO_INCREMENT UNIQUE,
-    stopStation INT NOT NULL,
-    stopLine INT NOT NULL,
-    departureDateTime DATETIME NOT NULL,
-    arrivalDateTime DATETIME NOT NULL,
-    PRIMARY KEY(stopId, stopStation, stopLine),
-    FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 -- Human --
 -- Table: Employee
 CREATE TABLE Employee (
@@ -90,6 +49,47 @@ CREATE TABLE Answers (
     answerDate DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (questionId) REFERENCES Questions(questionId) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (employeeSSN) REFERENCES Employee(ssn) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Transit --
+-- Table: Station
+CREATE TABLE Station (
+    stationId INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(20),
+    state CHAR(2)
+);
+
+-- Table: Train
+CREATE TABLE Train (
+    trainId INT CHECK (1000 <= trainId AND trainId <= 9999) PRIMARY KEY
+);
+
+-- Table: TransitLine
+CREATE TABLE TransitLine (
+    lineId INT AUTO_INCREMENT PRIMARY KEY,
+    lineName VARCHAR(50),
+    trainId INT NOT NULL,
+    origin INT NOT NULL,
+    destination INT NOT NULL,
+    departureDateTime DATETIME,
+    arrivalDateTime DATETIME,
+    fare FLOAT,
+    FOREIGN KEY (trainId) REFERENCES Train(trainId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (origin) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (destination) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+-- Table: Stop
+CREATE TABLE Stop (
+    stopId INT AUTO_INCREMENT UNIQUE,
+    stopStation INT NOT NULL,
+    stopLine INT NOT NULL,
+    departureDateTime DATETIME NOT NULL,
+    arrivalDateTime DATETIME NOT NULL,
+    PRIMARY KEY(stopId, stopStation, stopLine),
+    FOREIGN KEY (stopStation) REFERENCES Station(stationId) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (stopLine) REFERENCES TransitLine(lineId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- Table: Reservation

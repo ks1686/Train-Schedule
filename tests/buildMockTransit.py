@@ -1,15 +1,64 @@
-table = '''USE trains;'''
+table = '''USE trains;\n'''
 
-clearTable = '''
-SET FOREIGN_KEY_CHECKS=0; 
+clearTable = '''SET FOREIGN_KEY_CHECKS=0; 
+TRUNCATE TABLE Answers;
+TRUNCATE TABLE Questions;
+TRUNCATE TABLE Customer;
+TRUNCATE TABLE Manages;
+TRUNCATE TABLE Employee;
 TRUNCATE TABLE Stop;
 TRUNCATE TABLE TransitLine;
 TRUNCATE TABLE Train;
 TRUNCATE TABLE Station;
-SET FOREIGN_KEY_CHECKS=1;'''
+SET FOREIGN_KEY_CHECKS=1;
+'''
 
-src = '''
--- source: https://www.njtransit.com/pdf/rail/r0070.pdf'''
+customerFormat = '''INSERT INTO Customer (customerId, firstName, lastName, username, password, email) 
+VALUES
+    (1, 'Alice', 'Green', 'aliceg', 'securepass1', 'alice@example.com'),
+    (2, 'Bob', 'White', 'bobw', 'securepass2', 'bob@example.com'),
+    (3, 'Charlie', 'Black', 'charlieb', 'securepass3', 'charlie@example.com'),
+    (4, 'Daisy', 'Brown', 'daisyb', 'securepass4', 'daisy@example.com'),
+    (5, 'Evan', 'Gray', 'evang', 'securepass5', 'evan@example.com');
+'''
+employeeFormat = '''INSERT INTO Employee (ssn, firstName, lastName, username, password, role) 
+VALUES
+    ('111-11-1111', 'employee', 'one', 'emp1', 'emp1', 'Representative'),
+    ('123-45-6789', 'John', 'Doe', 'jdoe', 'password123', 'Manager'),
+    ('222-22-2222', 'manager', 'one', 'mgr1', 'mgr1', 'Manager'),
+    ('321-65-9874', 'Michael', 'Johnson', 'mjohnson', 'passwordabc', 'Manager'),
+    ('456-78-9012', 'Emily', 'Brown', 'ebrown', 'password789', 'Representative'),
+    ('654-32-1098', 'Sarah', 'Taylor', 'staylor', 'passwordxyz', 'Representative'),
+    ('987-65-4321', 'Jane', 'Smith', 'jsmith', 'password456', 'Representative');
+'''
+
+managesFormat = '''INSERT INTO Manages (manager_ssn, representative_ssn) 
+VALUES
+    ('123-45-6789', '111-11-1111'),
+    ('123-45-6789', '987-65-4321'),
+    ('222-22-2222', '456-78-9012'),
+    ('321-65-9874', '654-32-1098');
+'''
+
+questionsFormat = '''INSERT INTO Questions (questionId, customerId, questionText, questionDate) 
+VALUES
+    (1, 1, 'What are the available discounts?', '2024-12-08 02:19:27'),
+    (2, 2, 'Are pets allowed on trains?', '2024-12-08 02:19:27'),
+    (3, 3, 'Can I reschedule my reservation?', '2024-12-08 02:19:27'),
+    (4, 4, 'What are the COVID-19 precautions?', '2024-12-08 02:19:27'),
+    (5, 5, 'How can I book a round trip?', '2024-12-08 02:19:27');
+'''
+
+answersFormat = '''INSERT INTO Answers (answerId, questionId, employeeSSN, answerText, answerDate) 
+VALUES
+    (1, 1, '987-65-4321', 'Yes, students get 10% off.', '2024-12-08 02:20:25'),
+    (2, 2, '456-78-9012', 'Yes, small pets are allowed with a carrier.', '2024-12-08 02:20:25'),
+    (3, 3, '987-65-4321', 'You can reschedule up to 24 hours in advance.', '2024-12-08 02:20:25'),
+    (4, 4, '654-32-1098', 'We sanitize regularly and enforce mask-wearing.', '2024-12-08 02:20:25'),
+    (5, 5, '987-65-4321', 'Select the round-trip option during booking.', '2024-12-08 02:20:25');
+'''
+
+src = '''-- source: https://www.njtransit.com/pdf/rail/r0070.pdf'''
 
 stationFormat = '''INSERT INTO Station (name, city, state)
 VALUES 
@@ -156,9 +205,14 @@ for i in range(0, 31):
     '''
 stopFormat = stopFormat[:-6] + ';'
 
-with open('tests/sql/mock_transit.sql', 'w') as f:
+with open('tests/sql/table_data.sql', 'w') as f:
     print(table, file=f)
     print(clearTable, file=f)
+    print(customerFormat, file=f)
+    print(employeeFormat, file=f)
+    print(managesFormat, file=f)
+    print(questionsFormat, file=f)
+    print(answersFormat, file=f)
     print(src, file=f)
     print(stationFormat, file=f)
     print(trainFormat, file=f)
