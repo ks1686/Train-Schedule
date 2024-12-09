@@ -40,11 +40,10 @@
 
     try {
         ApplicationDB db = new ApplicationDB();
-        conn = db.getConnection();
-
+        conn = db.getConnection();       
         
-        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStopId, destinationStopId, reservationDateTime, isRoundTrip, discount) " +
-        								"VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?, ?, ?, ?, ?, ?)";
+        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStopId, destinationStopId, reservationDateTime, isRoundTrip, discount, totalFare) " +
+        								"VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?, ?, ?, ?, ?, ?, ?)";
         		
         ps = conn.prepareStatement(reservationInsertion);
        	ps.setString(1, username);
@@ -54,6 +53,7 @@
        	ps.setString(5, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
        	ps.setBoolean(6, tripType.equals("round") ? true : false); 
        	ps.setInt(7, discount);
+       	ps.setFloat(8, sched.getEstimatedFare());
 
         int rowsUpdated = ps.executeUpdate();
 

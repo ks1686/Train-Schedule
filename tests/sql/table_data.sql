@@ -62,9 +62,9 @@ INSERT INTO `Train` (`trainId`, `trainName`, `lineId`) VALUES
 (4, 'Amtrak 401', 4),
 (5, 'Amtrak 501', 5);
 
-INSERT INTO `Reservation` (`reservationNo`, `customerId`, `transitLineId`, `originStopId`, `destinationStopId`, `reservationDateTime`, `isRoundTrip`, `discount`) VALUES
-(1, 1, 1, 1, 4, '2024-12-01 10:00:00', 1, 10),
-(2, 2, 2, 3, 2, '2024-12-02 12:00:00', 0, 0),
-(3, 3, 3, 4, 3, '2024-12-03 14:00:00', 0, 5),
-(4, 4, 4, 5, 2, '2024-12-04 16:00:00', 1, 20),
-(5, 5, 5, 1, 3, '2024-12-05 18:00:00', 1, 15);
+INSERT INTO `Reservation` (`reservationNo`, `customerId`, `transitLineId`, `originStopId`, `destinationStopId`, `reservationDateTime`, `isRoundTrip`, `discount`, `totalFare`) VALUES
+(1, 1, 1, 1, 4, '2024-12-01 10:00:00', 1, 10, 100.00),
+(2, 2, 2, 3, 2, '2024-12-02 12:00:00', 0, 0, 100.00),
+(3, 3, 3, 4, 3, '2024-12-03 14:00:00', 0, 5, 100.00),
+(4, 4, 4, 5, 2, '2024-12-04 16:00:00', 1, 20, 100.00),
+(5, 5, 5, 1, 3, '2024-12-05 18:00:00', 1, 15, 100.00);
