@@ -145,8 +145,8 @@
             out.println("<th>Reservation No</th>");
             out.println("<th>Customer Name</th>");
             out.println("<th>Transit Line</th>");
-            out.println("<th>Origin Station</th>");
-            out.println("<th>Destination Station</th>");
+            out.println("<th>Origin Stop ID</th>");
+            out.println("<th>Destination Stop ID</th>");
             out.println("<th>Reservation Date/Time</th>");
             out.println("<th>Round Trip</th>");
             out.println("</tr>");

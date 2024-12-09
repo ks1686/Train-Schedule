@@ -372,6 +372,7 @@
 						<% for (Reservation reservation : currentReservations) { %>
 							<tr>
 								<td>
+									<b><i>#<%= reservation.getReservationNo() %></i></b><br><br>
 									<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
 									<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
 	 							</td>
@@ -441,6 +442,7 @@
 							<% for (Reservation reservation : pastReservations) { %>
 								<tr>
 									<td>
+										<b><i>#<%= reservation.getReservationNo() %></i></b><br><br>
 										<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
 										<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
 		 							</td>
