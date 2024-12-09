@@ -34,8 +34,8 @@ CREATE TABLE Train (
 -- Table: Stop
 CREATE TABLE Stop (
     stopId INT AUTO_INCREMENT UNIQUE,
-    stopStation INT,
-    stopLine INT,
+    stopStation INT NOT NULL,
+    stopLine INT NOT NULL,
     departureDateTime DATETIME NOT NULL,
     arrivalDateTime DATETIME NOT NULL,
     PRIMARY KEY(stopId, stopStation, stopLine),
