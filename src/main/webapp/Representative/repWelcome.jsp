@@ -385,7 +385,7 @@
 <div class="main-container">
     <div class="top-half">
         <div class="customer-header">
-            <p>Customer List By Transit and Reservation Booking Date:</p>
+            <p>Customer List By Transit and Reservation Date:</p>
         </div>
 		<div class="search-container">
 			<form method="GET" action="repWelcome.jsp">
@@ -455,7 +455,7 @@
                                    "FROM Reservation r " +
                                    "JOIN TransitLine tl ON r.transitLineId = tl.lineId " +
                                    "JOIN Customer c ON r.customerId = c.customerId " +
-                                   "WHERE tl.lineName = ? AND DATE(r.reservationDateTime) = ?";
+                                   "WHERE tl.lineName = ? AND DATE(tl.departureDateTime) = ?";
                     
                     ps3 = conn3.prepareStatement(query);
                     ps3.setString(1, lineName);
