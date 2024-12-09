@@ -153,6 +153,16 @@
             background-color: #2196F3;
             color: white;
         }
+        
+        .sort-button {
+        	color: white;
+            background-color: transparent;
+		    background-repeat: no-repeat;
+		    border: none;
+		    cursor: pointer;
+		    overflow: hidden;
+		    outline: none;
+        }
     </style>
 </head>
 <body>
@@ -362,7 +372,7 @@
                <th>Departure Time 
                 <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
                 	<input type="hidden" name="departureTimeSort" value="<%= departureTimeSort.equals("asc") ? "desc" : "asc" %>">
-				    <button type="submit">
+				    <button type="submit" class="sort-button">
 				        <%= departureTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
 				    </button>
 				</form>
@@ -371,7 +381,7 @@
                <th>Arrival Time 
                 <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
                 	<input type="hidden" name="arrivalTimeSort" value="<%= arrivalTimeSort.equals("asc") ? "desc" : "asc" %>">
-				    <button type="submit">
+				    <button type="submit" class="sort-button">
 				        <%= arrivalTimeSort.equals("asc") ? "&#9650;" : "&#9660;" %>
 				    </button>
 				</form>
@@ -380,7 +390,7 @@
                <th>Fare 
                 <form action="viewSchedules.jsp" method="POST" style="display: inline">	                	
                 	<input type="hidden" name="fareSort" value="<%= fareSort.equals("asc") ? "desc" : "asc" %>">
-				    <button type="submit">
+				    <button type="submit" class="sort-button">
 				        <%= fareSort.equals("asc") ? "&#9650;" : "&#9660;" %>
 				    </button>
 				</form>
