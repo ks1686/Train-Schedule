@@ -158,6 +158,7 @@
 		<table class="reservation-table">
         <thead>
             <tr>
+                <th>Train</th>
                 <th>Transit Line</th>
                 <th>Origin</th>
                 <th>Departure Time</th>
@@ -168,6 +169,7 @@
         </thead>
         <tbody>
 		    <tr>
+                <td><%= sched.getTrainId() %></td>
 		        <td><%= sched.getLineName() %></td>
 		        <td><%= sched.getOrigin().toString() %></td>
 		        <td><%= sched.getFormattedDepartureDateTime() %></td>

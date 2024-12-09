@@ -134,7 +134,7 @@
             
         String reservationQuery = 	"SELECT r.reservationNo, r.reservationDateTime, r.isRoundTrip, r.discount, " +
         							"c.customerId, c.firstName AS customerFirstName, c.lastName AS customerLastName, c.email AS customerEmail, " + 
-        							"tl.lineId AS transitLineId, tl.lineName AS transitLineName, r.totalFare AS transitLineFare, " + 
+        							"tl.lineId AS transitLineId, tl.lineName AS transitLineName, tl.trainId as trainId, r.totalFare AS transitLineFare, " + 
         							"r.originStopId AS reservationOriginStopId, s1.stopStation AS reservationOriginStationId, rs1.name AS reservationOriginStationName, " + 
         							"rs1.city AS reservationOriginCity, rs1.state AS reservationOriginState, s1.departureDateTime AS originStationDepartureTime, s1.arrivalDateTime AS originStationArrivalTime, " + 
         							"r.destinationStopId AS reservationDestinationStopId, s2.stopStation AS reservationDestinationStationId, rs2.name AS reservationDestinationStationName, " + 
@@ -161,6 +161,7 @@
 
             int transitLineId = rs2.getInt("transitLineId");
             String transitLineName = rs2.getString("transitLineName");
+            int trainId = rs2.getInt("trainId");
             float transitLineFare = rs2.getFloat("transitLineFare");
             
             int reservationOriginStopId = rs2.getInt("reservationOriginStopId");
@@ -179,7 +180,7 @@
             String destinationStationArrivalTime = rs2.getString("destinationStationArrivalTime");
             String destinationStationDepartureTime = rs2.getString("destinationStationDepartureTime");
             
-            Reservation reservation = new Reservation(reservationNo, reservationDateTime, isRoundTrip, discount, customerId, customerFirstName, customerLastName, customerEmail, transitLineId, transitLineName, transitLineFare, 
+            Reservation reservation = new Reservation(reservationNo, reservationDateTime, isRoundTrip, discount, customerId, customerFirstName, customerLastName, customerEmail, transitLineId, transitLineName, trainId, transitLineFare, 
             											reservationOriginStopId, reservationOriginStationId, reservationOriginStationName, reservationOriginCity, reservationOriginState, originStationArrivalTime, originStationDepartureTime,
 									            		reservationDestinationStopId, reservationDestinationStationId, reservationDestinationStationName, reservationDestinationCity, reservationDestinationState, destinationStationArrivalTime, destinationStationDepartureTime);
         
@@ -305,7 +306,8 @@
 									<b>Email:</b> <%= reservation.getCustomerEmail() %>
 	 							</td>
 								<td>
-									<%= reservation.getTransitLineName() %>
+									<b>Line:</b> <%= reservation.getTransitLineName() %> <br>
+									<b>Train:</b> <%= reservation.getTrainId() %>
 	 							</td>
 	 							<td>
 									<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>
@@ -373,7 +375,8 @@
 										<b>Email:</b> <%= reservation.getCustomerEmail() %>
 		 							</td>
 									<td>
-										<%= reservation.getTransitLineName() %>
+										<b>Line:</b> <%= reservation.getTransitLineName() %> <br>
+										<b>Train:</b> <%= reservation.getTrainId() %>
 		 							</td>
 		 							<td>
 										<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>

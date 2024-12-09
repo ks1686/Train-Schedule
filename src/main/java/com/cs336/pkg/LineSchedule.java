@@ -6,6 +6,7 @@ import java.time.*;
 public class LineSchedule {
 	private int lineId;
 	private String lineName;
+	private int trainId;
 	
 	private Station origin;
 	private LocalDateTime departureDateTime;
@@ -19,10 +20,11 @@ public class LineSchedule {
 	
 	private List<Object[]> stops;
 	
-	public LineSchedule(int lineId, String lineName, int originStationId, String originStationName, String originCity, String originState, String departureDateTime,
+	public LineSchedule(int lineId, String lineName, int trainId, int originStationId, String originStationName, String originCity, String originState, String departureDateTime,
 			int destinationStationId, String destinationStationName, String destinationCity, String destinationState, String arrivalDateTime, float lineFare) {
 		this.lineId = lineId;
 		this.lineName = lineName;
+		this.trainId = trainId;
 		
 		this.origin = new Station(originStationId, originStationName, originCity, originState);
 		this.departureDateTime = DateTimeConversion.strToDateTime(departureDateTime);
@@ -62,6 +64,8 @@ public class LineSchedule {
 	public int getLineId() { return lineId; }
 	
 	public String getLineName() { return lineName; }
+	
+	public int getTrainId() { return trainId; }
 	
 	public Station getOrigin() { return origin; }
 
