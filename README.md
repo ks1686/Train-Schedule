@@ -6,10 +6,47 @@ This project is a Train Reservation System that allows customers to make reserva
 
 ## Functionality
 
-- **Customer Management**: Customers can register, log in, and make reservations for train journeys.
-- **Employee Management**: Employees can answer customer queries and manage reservations.
-- **Managerial Oversight**: Managers can oversee the operations and manage employees.
-- **Train and Transit Management**: The system manages train schedules, stops, and transit lines.
+All functionality from the checklist has been implemented.
+
+#### I. **Account functionality**  
+- Register customers  
+- Login (for all customers, admin, customer reps)  
+- Logout (for all customers, admin, customer reps)  
+
+#### II. **Browsing and search functionality**  
+- Search for train schedules by origin, destination, date of travel   
+- Browse the resulting schedules   
+  - See all the stops a train will make, fare, etc.  
+- Sort by different criteria (by arrival time, departure time, fare)   
+
+#### III. **Reservations**  
+- A customer should be able to make a reservation for a specific route (round-trip/one way)   
+- Get a discount in case of child/senior/disabled   
+- Cancel existing reservation   
+- View current and past reservations with their details (separately)   
+
+#### IV. **Admin functions**  
+- Admin (create an admin account ahead of time)  
+  - Add, edit, and delete information for a customer representative   
+  - Obtain sales reports per month   
+  - Produce a list of reservations:   
+    - By transit line  
+    - By customer name  
+  - Produce a listing of revenue per:   
+    - Transit line  
+    - Customer name  
+- Best customer   
+- Best 5 most active transit lines   
+
+#### V. **Customer representative**  
+- Edit and delete information for train schedules   
+- Customers browse questions and answers   
+- Customers search questions by keywords   
+- Customers send a question to customer service   
+  - Reps reply to customer questions   
+- Produce a list of train schedules for a given station (as origin/destination)   
+- Produce a list of all customers who have reservations on a given transit line and date   
+
 
 ## File Structure
 
@@ -53,17 +90,35 @@ This project is a Train Reservation System that allows customers to make reserva
 │               │── logout.jsp
 │               └── register.jsp
 ├── tests
-│   └── sql
-│       ├── mock_transit.sql
-│       ├── table_data.sql
-│       └── schema.sql
+│   ├── sql
+│   │   ├── Dump20241209.sql
+│   │   ├── table_data.sql
+│   │   └── schema.sql
+│   ├── buildMockTransit.py
+│   └── mock_transit.png
 └── README.md
 ```
 
 - `src/main/java/com/cs336/pkg/ApplicationDB.java`: Java class for database connection management.
-- `tests/sql/mock_transit.sql`: SQL script for inserting mock transit data exclusively
-- `tests/sql/table_data.sql`: SQL script for inserting mock data into all tables
+- `tests/sql/Dump20241209.sql`: Complete SQL dump file containing the database schema and mock data for initializing the database.
+- `tests/sql/table_data.sql`: SQL script for inserting mock data into all tables.
 - `tests/sql/schema.sql`: SQL script for creating the database schema.
+- `tests/buildMockTransit.py`: Builds `./sql/table_data.sql` with appropriate data.
+- `tests/mock_transit.png`: Visual representation of NJ Transit lines, used as a reference for generating mock transit data.
+
+### Testing Credentials
+
+You can view the credentials for different roles in `table_data.sql`. Below are sample credentials for each role to start with:
+
+- **Manager**: 
+  - Username: `mgr1`
+  - Password: `mgr1`
+- **Employee**: 
+  - Username: `emp1`
+  - Password: `emp1`
+- **Customer**: 
+  - Username: `aliceg`
+  - Password: `securepass1`
 
 ## How to Test
 
@@ -82,10 +137,3 @@ This project is a Train Reservation System that allows customers to make reserva
 3. **Compile and Run the Application**.
 
 By following these steps, you can set up, configure, and test the Train Reservation System.
-
-## Contributors
-Vian Miranda: ERD, Database Schema, Java Classes, JSP Pages
-Parth Patel: ERD, Database Schema, Java Classes, JSP Pages
-Karim Smires: ERD, Database Schema, Java Classes, JSP Pages
-Raghav Kannan: Absolutely nothing
-```
