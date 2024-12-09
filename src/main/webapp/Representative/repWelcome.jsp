@@ -388,7 +388,7 @@
             <p>Customer List By Transit and Reservation Booking Date:</p>
         </div>
 		<div class="search-container">
-		                <form method="GET" action="repWelcome.jsp">
+			<form method="GET" action="repWelcome.jsp">
                 <label for="lineName">Select Transit Line:</label>
                 <select name="lineName" id="lineName" required>
                     <%
@@ -401,7 +401,7 @@
                         try {
                             ApplicationDB appdb2 = new ApplicationDB();
                             conn2 = appdb2.getConnection();
-                            ps2 = conn2.prepareStatement("SELECT * FROM TransitLine");
+                            ps2 = conn2.prepareStatement("SELECT DISTINCT lineName FROM TransitLine");
                             rs2 = ps2.executeQuery();
                             
                             while (rs2.next()) {
