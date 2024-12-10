@@ -4,6 +4,8 @@
 
 This project is a Train Reservation System that allows customers to make reservations for train journeys, employees to manage customer queries, and managers to oversee operations. The system is built using Java and SQL.
 
+[![Transit Application Demo](assets/transit-demo.gif "https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link")](https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link)
+
 ### Entity Relation Diagram (ERD)
 <p align="center">
     <picture>
@@ -66,7 +68,8 @@ All functionality from the checklist has been implemented.
 ├── assets
 │   ├── er_diagram-v3_dark.png
 │   ├── er_diagram-v3_light.png
-│   └── mock_transit.png
+│   ├── mock_transit.png
+│   └── transit-demo.gif
 ├── src
 │   └── main
 │       └── java
