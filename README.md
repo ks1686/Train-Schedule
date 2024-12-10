@@ -13,6 +13,8 @@ This project is a Train Reservation System that allows customers to make reserva
     </picture>
 </p>
 
+**Note**: While "Questions" and "Answers" could be combined into one entity because of their current one-to-one relationship, we've kept them separate to match our existing codebase. This separation makes the system easier to maintain and also allows for future flexibility, like adding multiple answers or replies to a single question (provided the cardinality constraint for "Questions" to "Reply" is updated). However, if a future refactor is considered, merging them could simplify the design by removing the "Reply" relationship and directly combining the entities.
+
 ## Functionality
 
 All functionality from the checklist has been implemented.
@@ -61,6 +63,10 @@ All functionality from the checklist has been implemented.
 
 ```
 .
+├── assets
+│   ├── er_diagram-v3_dark.png
+│   ├── er_diagram-v3_light.png
+│   └── mock_transit.png
 ├── src
 │   └── main
 │       └── java
@@ -107,13 +113,13 @@ All functionality from the checklist has been implemented.
 └── README.md
 ```
 
+- `assets/mock_transit.png`: Visual representation of NJ Transit lines, used as a reference for generating mock transit data.
+  - ![Mock Transit Line Source](assets/mock_transit.png)
 - `src/main/java/com/cs336/pkg/ApplicationDB.java`: Java class for database connection management.
 - `tests/sql/Dump20241209.sql`: Complete SQL dump file containing the database schema and mock data for initializing the database.
 - `tests/sql/table_data.sql`: SQL script for inserting mock data into all tables.
 - `tests/sql/schema.sql`: SQL script for creating the database schema.
 - `tests/buildMockTransit.py`: Builds `./sql/table_data.sql` with appropriate data.
-- `tests/mock_transit.png`: Visual representation of NJ Transit lines, used as a reference for generating mock transit data.
-  - ![Mock Transit Line Source](assets/mock_transit.png)
 
 
 ### Testing Credentials
