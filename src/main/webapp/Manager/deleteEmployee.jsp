@@ -2,53 +2,73 @@
 <%@ page import="java.io.*, java.sql.*, javax.servlet.http.*, javax.servlet.*"%>
 
 <%
-    
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
+    if (!Auth.requireRole(request, response, Roles.MANAGER)) {
         return;
     }
-    
-    // Check if the user is a manager   
-    if (!session.getAttribute("role").equals("Manager")) {
-        response.sendRedirect("../403.jsp");
+
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        response.sendRedirect("managerWelcome.jsp?message=Invalid+request");
         return;
     }
 
     String username = request.getParameter("username");
     if (username != null) {
-        Connection conn = null;
-        PreparedStatement ps = null;
+        username = username.trim();
+    }
+    String self = Auth.username(session);
+    if (username == null || username.isEmpty()) {
+        response.sendRedirect("managerWelcome.jsp?message=Invalid+employee+to+delete");
+        return;
+    }
+    if (username.equals(self)) {
+        response.sendRedirect("managerWelcome.jsp?message=Cannot+delete+yourself");
+        return;
+    }
 
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+
+    try {
+        ApplicationDB db = new ApplicationDB();
+        conn = db.getConnection();
+
+        ps = conn.prepareStatement("SELECT role FROM Employee WHERE username = ?");
+        ps.setString(1, username);
+        rs = ps.executeQuery();
+        if (!rs.next()) {
+            response.sendRedirect("managerWelcome.jsp?message=Invalid+employee+to+delete");
+            return;
+        }
+        if (Roles.MANAGER.equals(rs.getString("role"))) {
+            response.sendRedirect("managerWelcome.jsp?message=Cannot+delete+a+manager");
+            return;
+        }
+        rs.close();
+        rs = null;
+        ps.close();
+        ps = null;
+
+        ps = conn.prepareStatement("DELETE FROM Employee WHERE username = ? AND role = ?");
+        ps.setString(1, username);
+        ps.setString(2, Roles.REPRESENTATIVE);
+
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected > 0) {
+            response.sendRedirect("managerWelcome.jsp");
+        } else {
+            response.sendRedirect("managerWelcome.jsp?message=Failed+to+delete+employee");
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        response.sendRedirect("managerWelcome.jsp?message=Error+occurred+while+deleting+employee");
+    } finally {
         try {
-            ApplicationDB db = new ApplicationDB();
-            conn = db.getConnection();
-
-            String query = "DELETE FROM Employee WHERE username = ?";
-            ps = conn.prepareStatement(query);
-            ps.setString(1, username);
-
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                // Redirect to managerWelcome.jsp after deletion
-                response.sendRedirect("managerWelcome.jsp");
-            } else {
-                // Redirect to managerWelcome.jsp with a failure message (use query parameters if needed)
-                response.sendRedirect("managerWelcome.jsp?message=Failed to delete employee");
-            }
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
+            if (conn != null) conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            // Redirect to managerWelcome.jsp with an error message (use query parameters if needed)
-            response.sendRedirect("managerWelcome.jsp?message=Error occurred while deleting employee");
-        } finally {
-            try {
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
-    } else {
-        // If the username is not provided, redirect back with an error message
-        response.sendRedirect("managerWelcome.jsp?message=Invalid employee to delete");
     }
 %>
