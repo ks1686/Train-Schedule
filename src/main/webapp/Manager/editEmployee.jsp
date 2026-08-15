@@ -6,63 +6,7 @@
 <html>
 <head>
     <title>Edit Employee</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 0;
-        }
-
-        .header {
-            background-color: #333;
-            color: #fff;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 24px;
-        }
-
-        .main-container {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 15px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .edit-form input,
-        .edit-form select {
-            display: block;
-            margin-bottom: 15px;
-            padding: 10px;
-            width: 90%;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-
-        .edit-form button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-        }
-
-        .edit-form button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/app.css">
 </head>
 <body>
 
