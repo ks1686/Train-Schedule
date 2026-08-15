@@ -1,45 +1,34 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
-<%@ page import="java.io.*, java.util.*, java.sql.*, javax.servlet.http.*, javax.servlet.*"%>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Add Employee</title>
-    <style>
-        .employee-form input, .employee-form select {
-            display: block;
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 100%;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        .employee-form button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .employee-form button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
+<%@ page import="java.io.*, java.sql.*, javax.servlet.http.*, javax.servlet.*"%>
 
 <%
-    String username = (String) session.getAttribute("username");
-
-    if (session == null || username == null) {
-        response.sendRedirect("../login.jsp");
+    if (!Auth.requireRole(request, response, Roles.MANAGER)) {
         return;
     }
-    
-    // Check if the user is a manager   
-    if (!session.getAttribute("role").equals("Manager")) {
-        response.sendRedirect("../403.jsp");
+
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        response.sendRedirect("managerWelcome.jsp?add=error");
+        return;
+    }
+
+    String ssn = request.getParameter("ssn");
+    String firstName = request.getParameter("firstName");
+    String lastName = request.getParameter("lastName");
+    String usernameInput = request.getParameter("username");
+    String password = request.getParameter("password");
+
+    if (ssn != null) ssn = ssn.trim();
+    if (firstName != null) firstName = firstName.trim();
+    if (lastName != null) lastName = lastName.trim();
+    if (usernameInput != null) usernameInput = usernameInput.trim();
+    if (password != null) password = password.trim();
+
+    if (ssn == null || ssn.isEmpty()
+            || firstName == null || firstName.isEmpty()
+            || lastName == null || lastName.isEmpty()
+            || usernameInput == null || usernameInput.isEmpty()
+            || password == null || password.isEmpty()) {
+        response.sendRedirect("managerWelcome.jsp?add=failure");
         return;
     }
 
@@ -50,41 +39,24 @@
         ApplicationDB db = new ApplicationDB();
         conn = db.getConnection();
 
-        if (request.getMethod().equalsIgnoreCase("POST")) {
-            String ssn = request.getParameter("ssn").trim();
-            String firstName = request.getParameter("firstName").trim();
-            String lastName = request.getParameter("lastName").trim();
-            String usernameInput = request.getParameter("username").trim();
-            String password = request.getParameter("password").trim();
-            String role = request.getParameter("role").trim();
+        String query = "INSERT INTO Employee (ssn, firstName, lastName, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
+        ps = conn.prepareStatement(query);
+        ps.setString(1, ssn);
+        ps.setString(2, firstName);
+        ps.setString(3, lastName);
+        ps.setString(4, usernameInput);
+        ps.setString(5, Passwords.hash(password));
+        ps.setString(6, Roles.REPRESENTATIVE);
 
-            // Validate role
-            if (!role.equalsIgnoreCase("Manager") && !role.equalsIgnoreCase("Representative")) {
-                out.println("<p style='color: red;'>Invalid role. Please select either 'Manager' or 'Representative'.</p>");
-            } else {
-                // Insert the new employee into the database
-                String query = "INSERT INTO Employee (ssn, firstName, lastName, username, password, role) VALUES (?, ?, ?, ?, ?, ?)";
-                ps = conn.prepareStatement(query);
-                ps.setString(1, ssn);
-                ps.setString(2, firstName);
-                ps.setString(3, lastName);
-                ps.setString(4, usernameInput);
-                ps.setString(5, password);
-                ps.setString(6, role);
-
-                int rowsAffected = ps.executeUpdate();
-                if (rowsAffected > 0) {
-                    // Redirect to managerWelcome.jsp after successful insertion
-                    response.sendRedirect("managerWelcome.jsp");
-                    return; // Exit to ensure the rest of the code doesn't execute
-                } else {
-                    out.println("<p style='color: red;'>Failed to add employee. Please try again.</p>");
-                }
-            }
+        int rowsAffected = ps.executeUpdate();
+        if (rowsAffected > 0) {
+            response.sendRedirect("managerWelcome.jsp?add=success");
+        } else {
+            response.sendRedirect("managerWelcome.jsp?add=failure");
         }
     } catch (SQLException e) {
         e.printStackTrace();
-        out.println("<p style='color: red;'>An error occurred: " + e.getMessage() + "</p>");
+        response.sendRedirect("managerWelcome.jsp?add=error");
     } finally {
         try {
             if (ps != null) ps.close();
@@ -94,5 +66,3 @@
         }
     }
 %>
-</body>
-</html>

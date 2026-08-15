@@ -79,21 +79,12 @@
 </style>
 
 <%
-    // Check if the session is valid and the user is a manager
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-
-    if (!"Manager".equals(session.getAttribute("role"))) {
-        response.sendRedirect("../403.jsp");
+    if (!Auth.requireRole(request, response, Roles.MANAGER)) {
         return;
     }
 
     String transitLine = request.getParameter("transitLine");
     String customerName = request.getParameter("customerName");
-    String startDate = request.getParameter("startDate");
-    String endDate = request.getParameter("endDate");
 
     if ((transitLine == null || transitLine.isEmpty()) && (customerName == null || customerName.isEmpty())) {
         out.println("<p style='color: red;'>Please select either a transit line or a customer name to generate the report.</p>");
@@ -175,12 +166,12 @@
             while (rs.next()) {
                 out.println("<tr>");
                 if (transitLine != null && !transitLine.isEmpty() && customerName != null && !customerName.isEmpty()) {
-                    out.println("<td>" + rs.getString("lineName") + "</td>");
-                    out.println("<td>" + rs.getString("customerName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("lineName")) + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("customerName")) + "</td>");
                 } else if (transitLine != null && !transitLine.isEmpty()) {
-                    out.println("<td>" + rs.getString("lineName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("lineName")) + "</td>");
                 } else if (customerName != null && !customerName.isEmpty()) {
-                    out.println("<td>" + rs.getString("customerName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("customerName")) + "</td>");
                 }
                 out.println("<td>$" + String.format("%.2f", rs.getDouble("totalRevenue")) + "</td>");
                 out.println("</tr>");
