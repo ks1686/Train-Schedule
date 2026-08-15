@@ -78,14 +78,7 @@
 </style>
 
 <%
-    // Check if the session is valid and the user is a manager
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-
-    if (!"Manager".equals(session.getAttribute("role"))) {
-        response.sendRedirect("../403.jsp");
+    if (!Auth.requireRole(request, response, Roles.MANAGER)) {
         return;
     }
 
@@ -146,7 +139,7 @@
             companyReservations += totalReservations;
             companyRevenue += totalRevenue;
             out.println("<tr>");
-            out.println("<td>" + lineName + "</td>");
+            out.println("<td>" + Html.escape(lineName) + "</td>");
             out.println("<td>" + totalReservations + "</td>");
             out.println("<td>" + String.format("$%.2f", totalRevenue) + "</td>");
             out.println("</tr>");
