@@ -2,98 +2,15 @@
     pageEncoding="ISO-8859-1" import="java.io.*, java.util.*, java.sql.*, javax.servlet.http.*, javax.servlet.*"%>
 <%@ page import="com.cs336.pkg.*"%>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        margin: 0;
-        padding: 0;
-    }
-
-    .header {
-        background-color: #333;
-        color: #fff;
-        padding: 15px 20px;
-        text-align: center;
-        font-size: 24px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 20px 0;
-        background-color: #fff;
-    }
-
-    th, td {
-        border: 1px solid #ddd;
-        padding: 10px;
-        text-align: left;
-    }
-
-    th {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    tr:nth-child(even) {
-        background-color: #f2f2f2;
-    }
-
-    tr:hover {
-        background-color: #ddd;
-    }
-
-    h2 {
-        text-align: center;
-        margin-top: 20px;
-        color: #333;
-    }
-
-    .compact-button {
-        padding: 6px 12px;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor: pointer;
-        border: none;
-        background-color: #4CAF50;
-        color: white;
-        display: inline-block;
-        margin: 10px 0;
-    }
-
-    .compact-button:hover {
-        background-color: #45a049;
-    }
-
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        padding: 10px;
-        background-color: #333;
-        color: white;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-    }
-</style>
+<link rel="stylesheet" href="../css/app.css">
 
 <%
-    // Check if the session is valid and the user is a manager
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-
-    if (!"Manager".equals(session.getAttribute("role"))) {
-        response.sendRedirect("../403.jsp");
+    if (!Auth.requireRole(request, response, Roles.MANAGER)) {
         return;
     }
 
     String transitLine = request.getParameter("transitLine");
     String customerName = request.getParameter("customerName");
-    String startDate = request.getParameter("startDate");
-    String endDate = request.getParameter("endDate");
 
     if ((transitLine == null || transitLine.isEmpty()) && (customerName == null || customerName.isEmpty())) {
         out.println("<p style='color: red;'>Please select either a transit line or a customer name to generate the report.</p>");
@@ -111,10 +28,7 @@
             if (transitLine != null && !transitLine.isEmpty() && customerName != null && !customerName.isEmpty()) {
                 // Query for revenue by transit line and customer name
                 query.append("SELECT t.lineName, CONCAT(c.firstName, ' ', c.lastName) AS customerName, " +
-	                         "SUM(CASE WHEN r.isRoundTrip = TRUE " +
-	                         "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
-	                         "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
-	                         "	  END) AS totalRevenue " +
+	                         "SUM(r.totalFare) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "JOIN Customer c ON r.customerId = c.customerId " +
@@ -128,10 +42,7 @@
             } else if (transitLine != null && !transitLine.isEmpty()) {
                 // Query for revenue by transit line only
                 query.append("SELECT t.lineName, " +
-	                         "SUM(CASE WHEN r.isRoundTrip = TRUE " +
-	                         "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
-	                         "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
-	                         "    END) AS totalRevenue " +
+	                         "SUM(r.totalFare) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "WHERE t.lineName = ? " +
@@ -143,10 +54,7 @@
             } else if (customerName != null && !customerName.isEmpty()) {
                 // Query for revenue by customer name only
                 query.append("SELECT CONCAT(c.firstName, ' ', c.lastName) AS customerName, " +
-                        	 "SUM(CASE WHEN r.isRoundTrip = TRUE " +
-                        	 "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
-                        	 "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
-                        	 "	  END) AS totalRevenue " +
+                        	 "SUM(r.totalFare) AS totalRevenue " +
                              "FROM Reservation r " +
                              "JOIN TransitLine t ON r.transitLineId = t.lineId " +
                              "JOIN Customer c ON r.customerId = c.customerId " +
@@ -184,12 +92,12 @@
             while (rs.next()) {
                 out.println("<tr>");
                 if (transitLine != null && !transitLine.isEmpty() && customerName != null && !customerName.isEmpty()) {
-                    out.println("<td>" + rs.getString("lineName") + "</td>");
-                    out.println("<td>" + rs.getString("customerName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("lineName")) + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("customerName")) + "</td>");
                 } else if (transitLine != null && !transitLine.isEmpty()) {
-                    out.println("<td>" + rs.getString("lineName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("lineName")) + "</td>");
                 } else if (customerName != null && !customerName.isEmpty()) {
-                    out.println("<td>" + rs.getString("customerName") + "</td>");
+                    out.println("<td>" + Html.escape(rs.getString("customerName")) + "</td>");
                 }
                 out.println("<td>$" + String.format("%.2f", rs.getDouble("totalRevenue")) + "</td>");
                 out.println("</tr>");

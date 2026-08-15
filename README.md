@@ -65,94 +65,53 @@ All functionality from the checklist has been implemented.
 
 ```
 .
-├── assets
-│   ├── er_diagram-v3_dark.png
-│   ├── er_diagram-v3_light.png
-│   ├── mock_transit.png
-│   └── transit-demo.gif
-├── src
-│   └── main
-│       └── java
-│           ├── com
-│           │   └── cs336
-│           │       └── pkg
-│           │           ├── DateTimeConversion.java
-│           │           ├── LineSchedule.java
-│           │           ├── Reservation.java
-│           │           ├── Station.java
-│           │           └── ApplicationDB.java
-│           └── webapp
-│               ├── Customer
-│               │   ├── askQuestion.jsp
-│               │   ├── cancelReservation.jsp
-│               │   ├── confirmReservation.jsp
-│               │   ├── customerWelcome.jsp
-│               │   ├── placeReservation
-│               │   └── viewSchedules.jsp
-│               ├── Manager
-│               │   ├── addEmployee.jsp
-│               │   ├── deleteEmployee.jsp
-│               │   ├── editEmployee.jsp
-│               │   ├── getReservations.jsp
-│               │   ├── getRevenue.jsp
-│               │   ├── getSalesReport.jsp
-│               │   ├── managerWelcome.jsp
-│               │   └── updateEmployee.jsp
-│               ├── Representative
-│               │   ├── deleteSchedule.jsp
-│               │   ├── repWelcome.jsp
-│               │   ├── updateSchedule.jsp
-│               │   └── viewStops.jsp
-│               ├── 403.jsp
-│               ├── login.jsp
-│               │── logout.jsp
-│               └── register.jsp
-├── tests
-│   ├── sql
-│   │   ├── Dump20241209.sql
-│   │   ├── table_data.sql
-│   │   └── schema.sql
-│   └──  buildMockTransit.py
-└── README.md
+├── pom.xml
+├── assets/
+├── src/main/java/com/cs336/pkg/     # helpers, DAOs, models, AuthFilter
+├── src/main/webapp/                 # JSPs, css/app.css, WEB-INF
+│   ├── Customer/placeReservation.jsp
+│   ├── Manager/
+│   └── Representative/
+├── src/test/java/com/cs336/pkg/     # JUnit for dates, passwords, fares
+└── tests/
+    ├── buildMockTransit.py
+    └── sql/
+        ├── schema.sql               # source of truth
+        ├── table_data.sql           # source of truth for mock rows
+        ├── migrate_from_v1.sql      # ALTER path for existing trains DBs
+        └── Dump20241209.sql         # historical dump; do not regenerate
 ```
 
 - `assets/mock_transit.png`: Visual representation of NJ Transit lines, used as a reference for generating mock transit data.
   - ![Mock Transit Line Source](assets/mock_transit.png)
-- `src/main/java/com/cs336/pkg/ApplicationDB.java`: Java class for database connection management.
-- `tests/sql/Dump20241209.sql`: Complete SQL dump file containing the database schema and mock data for initializing the database.
-- `tests/sql/table_data.sql`: SQL script for inserting mock data into all tables.
-- `tests/sql/schema.sql`: SQL script for creating the database schema.
-- `tests/buildMockTransit.py`: Builds `./sql/table_data.sql` with appropriate data.
-
+- `src/main/java/com/cs336/pkg/ApplicationDB.java`: JDBC factory. Reads `DB_URL`, `DB_USER`, `DB_PASSWORD` from the environment (defaults: `jdbc:mysql://localhost:3306/trains`, `root`, empty password).
+- `tests/sql/schema.sql` + `tests/sql/table_data.sql`: source of truth for schema and seed data. `Dump20241209.sql` is a historical snapshot.
+- `tests/buildMockTransit.py`: writes `tests/sql/table_data.sql`.
+- `Reservation.totalFare` is the **charged** amount (segment fare × round-trip × discount). Reports `SUM(totalFare)` and do not re-apply multipliers.
 
 ### Testing Credentials
 
-You can view the credentials for different roles in `table_data.sql`. Below are sample credentials for each role to start with:
+Seed passwords in `table_data.sql` are plaintext for first login. The app hashes them with jBCrypt on first successful login (legacy upgrade). After that, the stored value starts with `$2`.
 
-- **Manager**: 
-  - Username: `mgr1`
-  - Password: `mgr1`
-- **Employee**: 
-  - Username: `emp1`
-  - Password: `emp1`
-- **Customer**: 
-  - Username: `aliceg`
-  - Password: `securepass1`
+- **Manager**: `mgr1` / `mgr1`
+- **Employee**: `emp1` / `emp1`
+- **Customer**: `aliceg` / `securepass1`
 
 ## How to Test
 
 1. **Set Up the Database**:
-    - Ensure MySQL is installed and running on your machine.
-    - Create the database and tables by running the respective scripts or using the command line.
-    - Make sure JDBC is installed and configured on your machine.
+    - MySQL running locally.
+    - Fresh install: `schema.sql` then `table_data.sql`.
+    - Existing `trains` DB from the original schema: `tests/sql/migrate_from_v1.sql`.
 
 2. **Configure Database Connection**:
-    - Update the `DB_USER` and `DB_PASSWORD` in `ApplicationDB.java` with your MySQL credentials.
+    - Optional env vars: `DB_URL`, `DB_USER`, `DB_PASSWORD`. Defaults still work for local root with an empty password.
 
-3. **Ensure Tomcat 9 Configuration**:
-    - Ensure Tomcat 9 is installed and configured on your machine.
-    - Follow the sample project in the course files.
+3. **Tomcat 9**:
+    - Eclipse + Tomcat 9 still works (`.classpath` / `.project`).
+    - Or `mvn package` and deploy `target/train-schedule.war`.
+    - Connector/J 8 and jBCrypt are in `src/main/webapp/WEB-INF/lib/`.
 
-3. **Compile and Run the Application**.
+4. **Unit tests** (no Tomcat): compile `src/test/java` with JUnit 4 against `src/main/java`.
 
-By following these steps, you can set up, configure, and test the Train Reservation System.
+5. **Manual smoke**: login POST as the three roles; a customer cannot cancel another user's reservation; manager cannot add a Manager or delete self; employee passwords never appear in page source.

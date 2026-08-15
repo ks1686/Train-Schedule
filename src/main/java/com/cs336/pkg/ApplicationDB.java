@@ -8,52 +8,54 @@ import java.util.logging.Logger;
 
 public class ApplicationDB {
 
-	// Database connection parameters
-	private static final String DB_URL = "jdbc:mysql://localhost:3306/trains"; // change the port number if necessary
-	private static final String DB_USER = "root"; // set your MySQL username here
-	private static final String DB_PASSWORD = ""; // set your MySQL password here
+	private static final String DEFAULT_URL = "jdbc:mysql://localhost:3306/trains";
+	private static final String DEFAULT_USER = "root";
+	private static final String DEFAULT_PASSWORD = "";
 	private static final Logger LOGGER = Logger.getLogger(ApplicationDB.class.getName());
-	
-	// Constructor
+
 	public ApplicationDB(){
 	}
 
-	// Connect to the database
 	public Connection getConnection(){
-		//Create a connection string
-		Connection connection = null;
-		
+		String url = envOr("DB_URL", DEFAULT_URL);
+		String user = envOr("DB_USER", DEFAULT_USER);
+		String password = envOr("DB_PASSWORD", DEFAULT_PASSWORD);
+
 		try {
-			//Load JDBC driver - the interface standardizing the connection procedure. Look at WEB-INF\lib for a mysql connector jar file, otherwise it fails.
-			Class.forName("com.mysql.jdbc.Driver").newInstance();
-		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			Class.forName("com.mysql.cj.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
 			LOGGER.log(Level.SEVERE, "Error loading MySQL driver", e);
+			throw new IllegalStateException("MySQL driver not found", e);
 		}
+
 		try {
-			//Create a connection to your DB
-			connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+			return DriverManager.getConnection(url, user, password);
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, "Error connecting to database", e);
+			throw new IllegalStateException("Unable to connect to database", e);
 		}
-		
-		return connection;
 	}
-	
-	// Close the database connection
+
 	public void closeConnection(Connection connection){
+		if (connection == null) {
+			return;
+		}
 		try {
 			connection.close();
 		} catch (SQLException e) {
 			LOGGER.log(Level.SEVERE, "Error closing database connection", e);
 		}
 	}
-	
-	// Test the database connection
+
+	private static String envOr(String name, String fallback) {
+		String value = System.getenv(name);
+		return value == null || value.isEmpty() ? fallback : value;
+	}
+
 	public static void main(String[] args) {
 		ApplicationDB dao = new ApplicationDB();
 		Connection connection = dao.getConnection();
-		
-		System.out.println(connection);		
+		System.out.println(connection);
 		dao.closeConnection(connection);
 	}
 }

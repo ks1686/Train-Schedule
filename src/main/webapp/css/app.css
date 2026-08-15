@@ -1,0 +1,177 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header .username {
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.login-container,
+.register-container {
+    width: 300px;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    text-align: center;
+    margin: 10vh auto;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"],
+.register-container input[type="text"],
+.register-container input[type="password"],
+.register-container input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.login-container input[type="submit"],
+.register-container input[type="submit"],
+.search-container input[type="submit"],
+.employee-form button,
+.sales-report-form button,
+.reserve-button,
+.compact-button {
+    padding: 10px 16px;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.login-container input[type="submit"]:hover,
+.register-container input[type="submit"]:hover,
+.search-container input[type="submit"]:hover,
+.employee-form button:hover,
+.sales-report-form button:hover,
+.reserve-button:hover,
+.compact-button:hover {
+    background-color: #45a049;
+}
+
+.error-message { color: red; font-size: 14px; margin-bottom: 10px; }
+.logout-message, .success-message { color: green; font-size: 14px; margin-bottom: 10px; }
+
+.register-link, .register-container a { color: #4CAF50; text-decoration: none; }
+.register-link a:hover, .register-container a:hover { text-decoration: underline; }
+
+table, .employee-table, .reservation-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #fff;
+}
+
+th, td, .employee-table th, .employee-table td, .reservation-table th, .reservation-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+th, .employee-table th, .reservation-table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tr:nth-child(even) { background-color: #f9f9f9; }
+tr:hover { background-color: #f1f1f1; }
+
+.logout-button {
+    padding: 8px 16px;
+    background-color: #f44336;
+    color: white;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.logout-button:hover { background-color: #d32f2f; }
+
+.clear-button {
+    padding: 8px 16px;
+    background-color: #228c22;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button, .view-button { background-color: #2196F3; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+.delete-button, .cancel-reservation { background-color: #f44336; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+.save-button { background-color: #4CAF50; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+.viewQuestions { background-color: #2196F3; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+
+.employee-form input, .employee-form select,
+.sales-report-form select, .form-container input, .form-container textarea {
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px;
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+}
+
+.sales-report-form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.question-item {
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.finalizeForm {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sort-button {
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.info-text { color: gray; font-size: 12px; }
+.label-bold { font-weight: bold; }

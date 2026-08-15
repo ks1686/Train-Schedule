@@ -2,4 +2,6 @@
 .idea
 .smarttomcat
 cs336FinalProject.iml
-build/classes/com/cs336/.DS_Store
+build/
+*.class
+target/
