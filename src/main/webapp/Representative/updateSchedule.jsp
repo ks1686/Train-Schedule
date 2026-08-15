@@ -1,21 +1,18 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
-<%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*"%>
+<%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*,java.time.LocalDateTime"%>
 
 <%
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-    
-    String role = (String) session.getAttribute("role");
-    if (!role.equals("Representative")) {
-        response.sendRedirect("../403.jsp");
+    if (!Auth.requireRole(request, response, Roles.REPRESENTATIVE)) {
         return;
     }
 
-    // Retrieve the parameters sent via POST
-    String lineId = request.getParameter("lineId");
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        out.print("Invalid request.");
+        return;
+    }
+
+    String lineIdParam = request.getParameter("lineId");
     String departure = request.getParameter("departure");
     String arrival = request.getParameter("arrival");
     String lineName = request.getParameter("lineName");
@@ -23,69 +20,105 @@
     String destination = request.getParameter("destination");
     String fare = request.getParameter("fare");
 
-    // Connection setup for the database
+    if (lineIdParam == null || lineName == null || origin == null || destination == null
+            || departure == null || arrival == null || fare == null
+            || lineName.trim().isEmpty() || origin.trim().isEmpty() || destination.trim().isEmpty()
+            || departure.trim().isEmpty() || arrival.trim().isEmpty() || fare.trim().isEmpty()) {
+        out.print("Error: All schedule fields are required.");
+        return;
+    }
+
+    int lineId;
+    float fareValue;
+    LocalDateTime departureDateTime;
+    LocalDateTime arrivalDateTime;
+    try {
+        lineId = Integer.parseInt(lineIdParam.trim());
+        fareValue = Float.parseFloat(fare.trim());
+        departureDateTime = DateTimeConversion.strToDateTime(departure);
+        arrivalDateTime = DateTimeConversion.strToDateTime(arrival);
+    } catch (RuntimeException e) {
+        out.print("Error: Invalid schedule values.");
+        return;
+    }
+
     Connection conn = null;
     PreparedStatement ps = null;
-    ResultSet rs = null;
-
     try {
         ApplicationDB appdb = new ApplicationDB();
         conn = appdb.getConnection();
-        
-        // Query to find stationId for origin
-        String getOriginIdQuery = "SELECT stationId FROM Station WHERE name = ?";
-        ps = conn.prepareStatement(getOriginIdQuery);
-        ps.setString(1, origin);
-        rs = ps.executeQuery();
-        
-        if (rs.next()) {
-            int originStationId = rs.getInt("stationId");
-            
-            // Reset the prepared statement to find the stationId for destination
-            rs.close();
-            ps.close();
-            
-            String getDestinationIdQuery = "SELECT stationId FROM Station WHERE name = ?";
-            ps = conn.prepareStatement(getDestinationIdQuery);
-            ps.setString(1, destination);
-            rs = ps.executeQuery();
+        StationDao stations = new StationDao();
 
-            if (rs.next()) {
-                int destinationStationId = rs.getInt("stationId");
-                
-                // Now, update the TransitLine table using these station IDs
-                String updateQuery = "UPDATE TransitLine SET lineName = ?, origin = ?, destination = ?, departureDateTime = ?, arrivalDateTime = ?, fare = ? WHERE lineId = ?";
-                ps = conn.prepareStatement(updateQuery);
-                ps.setString(1, lineName);
-                ps.setInt(2, originStationId); // Set the origin as an integer ID
-                ps.setInt(3, destinationStationId); // Set the destination as an integer ID
-                ps.setString(4, departure);
-                ps.setString(5, arrival);
-                ps.setFloat(6, Float.parseFloat(fare));
-                ps.setInt(7, Integer.parseInt(lineId));
-                
-                int result = ps.executeUpdate();
-                if (result > 0) {
-                    response.sendRedirect("repWelcome.jsp");
-                } else {
-                    response.sendRedirect("repWelcome.jsp");
-                }
-            } else {
-                out.print("Error: Destination station not found.");
-            }
-        } else {
+        Integer originStationId = stations.findIdByName(conn, origin.trim());
+        if (originStationId == null) {
             out.print("Error: Origin station not found.");
+            return;
         }
+        Integer destinationStationId = stations.findIdByName(conn, destination.trim());
+        if (destinationStationId == null) {
+            out.print("Error: Destination station not found.");
+            return;
+        }
+
+        conn.setAutoCommit(false);
+
+        ps = conn.prepareStatement(
+                "UPDATE TransitLine SET lineName = ?, origin = ?, destination = ?, departureDateTime = ?, arrivalDateTime = ?, fare = ? WHERE lineId = ?");
+        ps.setString(1, lineName.trim());
+        ps.setInt(2, originStationId);
+        ps.setInt(3, destinationStationId);
+        ps.setTimestamp(4, DateTimeConversion.toTimestamp(departureDateTime));
+        ps.setTimestamp(5, DateTimeConversion.toTimestamp(arrivalDateTime));
+        ps.setFloat(6, fareValue);
+        ps.setInt(7, lineId);
+        ps.executeUpdate();
+        ps.close();
+        ps = null;
+
+        ps = conn.prepareStatement(
+                "UPDATE Stop SET departureDateTime = ? WHERE stopLine = ? AND stopStation = ?");
+        ps.setTimestamp(1, DateTimeConversion.toTimestamp(departureDateTime));
+        ps.setInt(2, lineId);
+        ps.setInt(3, originStationId);
+        ps.executeUpdate();
+        ps.close();
+        ps = null;
+
+        ps = conn.prepareStatement(
+                "UPDATE Stop SET arrivalDateTime = ? WHERE stopLine = ? AND stopStation = ?");
+        ps.setTimestamp(1, DateTimeConversion.toTimestamp(arrivalDateTime));
+        ps.setInt(2, lineId);
+        ps.setInt(3, destinationStationId);
+        ps.executeUpdate();
+        ps.close();
+        ps = null;
+
+        conn.commit();
+        response.sendRedirect("repWelcome.jsp");
     } catch (SQLException e) {
-        e.printStackTrace();
-        out.print("Error: " + e.getMessage());
-    } finally {
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (conn != null) {
+            try {
+                conn.rollback();
+            } catch (SQLException ignored) {
+                // ignore rollback errors
+            }
         }
+        out.print("Error updating schedule.");
+    } finally {
+        if (ps != null) {
+            try {
+                ps.close();
+            } catch (SQLException ignored) {
+                // ignore close errors
+            }
+        }
+        if (conn != null) {
+            try {
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) {
+                // ignore reset errors
+            }
+        }
+        new ApplicationDB().closeConnection(conn);
     }
 %>

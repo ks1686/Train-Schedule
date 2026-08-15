@@ -1,55 +1,62 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*"%>
 
 <%
-
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
+    if (!Auth.requireRole(request, response, Roles.REPRESENTATIVE)) {
         return;
     }
-    
-    String role = (String) session.getAttribute("role");
-    if (!role.equals("Representative")) {
-        response.sendRedirect("../403.jsp");
+
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        out.print("Invalid request.");
         return;
     }
 
     String lineId = request.getParameter("lineId");
+    if (lineId == null || lineId.trim().isEmpty()) {
+        out.print("invalid lineId");
+        return;
+    }
 
-    // Check if lineId is valid
-    if (lineId != null && !lineId.isEmpty()) {
-        Connection conn = null;
-        PreparedStatement ps = null;
+    int parsedLineId;
+    try {
+        parsedLineId = Integer.parseInt(lineId.trim());
+    } catch (NumberFormatException e) {
+        out.print("invalid lineId");
+        return;
+    }
 
-        try {
-            ApplicationDB appdb = new ApplicationDB();
-            conn = appdb.getConnection();
+    Connection conn = null;
+    PreparedStatement ps = null;
+    try {
+        ApplicationDB appdb = new ApplicationDB();
+        conn = appdb.getConnection();
 
-            String deleteQuery = "DELETE FROM TransitLine WHERE lineId = ?";
+        ps = conn.prepareStatement("DELETE FROM TransitLine WHERE lineId = ?");
+        ps.setInt(1, parsedLineId);
 
-            ps = conn.prepareStatement(deleteQuery);
-            ps.setInt(1, Integer.parseInt(lineId));
-
-            int result = ps.executeUpdate();
-            if (result > 0) {
-                // redirect back to repWelcome.jsp
-                response.sendRedirect("repWelcome.jsp");
-            } else {
-                out.print("failure");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            out.print("error");
-        } finally {
+        int result = ps.executeUpdate();
+        if (result > 0) {
+            response.sendRedirect("repWelcome.jsp");
+        } else {
+            out.print("Schedule not found.");
+        }
+    } catch (SQLException e) {
+        String sqlState = e.getSQLState();
+        boolean referenced = "23000".equals(sqlState) || e.getErrorCode() == 1451 || e.getErrorCode() == 1217;
+        if (referenced) {
+            out.print("Cannot delete this schedule because tickets already exist for it.");
+        } else {
+            out.print("Error deleting schedule.");
+        }
+    } finally {
+        if (ps != null) {
             try {
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+                ps.close();
+            } catch (SQLException ignored) {
+                // ignore close errors
             }
         }
-    } else {
-        out.print("invalid lineId");
+        new ApplicationDB().closeConnection(conn);
     }
 %>

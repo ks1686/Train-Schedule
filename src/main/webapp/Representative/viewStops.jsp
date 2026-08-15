@@ -1,67 +1,49 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="com.cs336.pkg.*"%>
 <%@ page import="java.io.*,java.util.*,java.sql.*,javax.servlet.http.*,javax.servlet.*"%>
 
 <%
-    if (session == null || session.getAttribute("username") == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-    
-    String role = (String) session.getAttribute("role");
-    if (!role.equals("Representative")) {
-        response.sendRedirect("../403.jsp");
+    if (!Auth.requireRole(request, response, Roles.REPRESENTATIVE)) {
         return;
     }
 
     String lineIdString = request.getParameter("lineId");
-    int lineId = Integer.parseInt(lineIdString);
     String origin = request.getParameter("origin");
     String destination = request.getParameter("destination");
 
-    // Check if lineId is valid
-    if (lineIdString != null && origin != null && destination != null &&
-        !lineIdString.isEmpty() && !origin.isEmpty() && !destination.isEmpty()) {
+    if (lineIdString == null || lineIdString.trim().isEmpty()) {
+        out.print("Invalid input. Please provide Line ID.");
+        return;
+    }
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+    int lineId;
+    try {
+        lineId = Integer.parseInt(lineIdString.trim());
+    } catch (NumberFormatException e) {
+        out.print("Invalid input. Please provide Line ID.");
+        return;
+    }
 
-        try {
-            ApplicationDB appdb = new ApplicationDB();
-            conn = appdb.getConnection();
+    Connection conn = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        ApplicationDB appdb = new ApplicationDB();
+        conn = appdb.getConnection();
 
-            String sql = "SELECT st.stationId, st.name, st.city, st.state, sp.departureDateTime, sp.arrivalDateTime " +
-                         "FROM Stop sp " +
-                         "JOIN Station st ON sp.stopStation = st.stationId " +
-                         "WHERE sp.stopLine = ? " +
-                         "AND st.stationId IN ( " +
-                         "    SELECT origin FROM TransitLine WHERE lineId = ? " +
-                         "    UNION " +
-                         "    SELECT destination FROM TransitLine WHERE lineId = ? " +
-                         "    UNION " +
-                         "    SELECT stopStation FROM Stop WHERE stopLine = ? " +
-                         "      AND stopStation BETWEEN " +
-                         "          (SELECT origin FROM TransitLine WHERE lineId = ?) " +
-                         "          AND " +
-                         "          (SELECT destination FROM TransitLine WHERE lineId = ?) " +
-                         ") " +
-                         "ORDER BY sp.departureDateTime";
-    
-            ps = conn.prepareStatement(sql);
-            ps.setInt(1, lineId);
-            ps.setInt(2, lineId);
-            ps.setInt(3, lineId);
-            ps.setInt(4, lineId);
-            ps.setInt(5, lineId);
-            ps.setInt(6, lineId);
-            rs = ps.executeQuery();
+        String sql = "SELECT st.stationId, st.name, st.city, st.state, sp.departureDateTime, sp.arrivalDateTime "
+                + "FROM Stop sp "
+                + "JOIN Station st ON sp.stopStation = st.stationId "
+                + "WHERE sp.stopLine = ? "
+                + "ORDER BY sp.departureDateTime";
+        ps = conn.prepareStatement(sql);
+        ps.setInt(1, lineId);
+        rs = ps.executeQuery();
 %>
 <!DOCTYPE html>
 <html>
 <head>
     <title>View Stops</title>
-    <link rel="stylesheet" type="text/css" href="../styles.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -139,7 +121,7 @@
     </style>
 </head>
 <body>
-    <h2>Stops between <%= origin %> and <%= destination %> on Line: <%= lineId %></h2>
+    <h2>Stops between <%= Html.escape(origin) %> and <%= Html.escape(destination) %> on Line: <%= lineId %></h2>
     <table>
         <thead>
             <tr>
@@ -157,11 +139,11 @@
         %>
             <tr>
                 <td><%= rs.getInt("stationId") %></td>
-                <td><%= rs.getString("name") %></td>
-                <td><%= rs.getString("city") %></td>
-                <td><%= rs.getString("state") %></td>
-                <td><%= rs.getTimestamp("departureDateTime") %></td>
-                <td><%= rs.getTimestamp("arrivalDateTime") %></td>
+                <td><%= Html.escape(rs.getString("name")) %></td>
+                <td><%= Html.escape(rs.getString("city")) %></td>
+                <td><%= Html.escape(rs.getString("state")) %></td>
+                <td><%= Html.escape(rs.getString("departureDateTime")) %></td>
+                <td><%= Html.escape(rs.getString("arrivalDateTime")) %></td>
             </tr>
         <%
             }
@@ -171,19 +153,15 @@
 </body>
 </html>
 <%
+    } catch (SQLException e) {
+        out.print("An error occurred while retrieving the stops.");
+    } finally {
+        try {
+            if (rs != null) rs.close();
+            if (ps != null) ps.close();
         } catch (SQLException e) {
-            e.printStackTrace();
-            out.print("An error occurred while retrieving the stops.");
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            // ignore close errors
         }
-    } else {
-        out.print("Invalid input. Please provide Line ID, Origin, and Destination.");
+        new ApplicationDB().closeConnection(conn);
     }
 %>
