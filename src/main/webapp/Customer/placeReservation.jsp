@@ -3,18 +3,10 @@
 <%@ page import="com.cs336.pkg.*"%>
 
 <%
-	String username = (String) session.getAttribute("username");
-
-    if (session == null || username == null) {
-        response.sendRedirect("../login.jsp");
+    if (!Auth.requireRole(request, response, Roles.CUSTOMER)) {
         return;
     }
-    
-    // Check if the user is a Customer   
-    if (!session.getAttribute("role").equals("Customer")) {
-        response.sendRedirect("../403.jsp");
-        return;
-    }
+    String username = Auth.username(session);
 
     if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
         response.sendRedirect("customerWelcome.jsp?reservation=failure");
@@ -45,8 +37,8 @@
     try {
         String origin = (String) session.getAttribute("originStationId");
         String dest = (String) session.getAttribute("destinationStationId");
-        if (origin != null) originStationId = Integer.valueOf(origin);
-        if (dest != null) destinationStationId = Integer.valueOf(dest);
+        if (origin != null && !origin.isEmpty()) originStationId = Integer.valueOf(origin);
+        if (dest != null && !dest.isEmpty()) destinationStationId = Integer.valueOf(dest);
     } catch (NumberFormatException ignored) {
     }
 
