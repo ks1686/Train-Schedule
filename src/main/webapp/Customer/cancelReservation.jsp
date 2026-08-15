@@ -1,37 +1,31 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" 
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1" import="java.io.*, java.sql.*,java.time.*,java.time.format.DateTimeFormatter"%>
 <%@ page import="com.cs336.pkg.*"%>
 
 <%
-	String username = (String) session.getAttribute("username");
-
-    if (session == null || username == null) {
-        response.sendRedirect("../login.jsp");
+    if (!Auth.requireRole(request, response, Roles.CUSTOMER)) {
         return;
     }
-    
-    // Check if the user is a Customer   
-    if (!session.getAttribute("role").equals("Customer")) {
-        response.sendRedirect("../403.jsp");
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        response.sendRedirect("customerWelcome.jsp?cancellation=failure");
         return;
     }
 
-    int reservationNo = Integer.valueOf(request.getParameter("cancel"));
-    
-    Connection conn = null;
-    PreparedStatement ps = null;
-
+    String username = Auth.username(session);
+    String cancelParam = request.getParameter("cancel");
+    int reservationNo;
     try {
-        ApplicationDB db = new ApplicationDB();
+        reservationNo = Integer.parseInt(cancelParam);
+    } catch (Exception e) {
+        response.sendRedirect("customerWelcome.jsp?cancellation=failure");
+        return;
+    }
+
+    ApplicationDB db = new ApplicationDB();
+    Connection conn = null;
+    try {
         conn = db.getConnection();
-
-        String reservationCancellation = "DELETE FROM Reservation WHERE reservationNo = ?";
-        
-        ps = conn.prepareStatement(reservationCancellation);
-       	ps.setInt(1, reservationNo);
-
-        int rowsUpdated = ps.executeUpdate();
-
+        int rowsUpdated = new ReservationDao().deleteOwned(conn, reservationNo, username);
         if (rowsUpdated > 0) {
             response.sendRedirect("customerWelcome.jsp?cancellation=success");
         } else {
@@ -41,11 +35,6 @@
         e.printStackTrace();
         response.sendRedirect("customerWelcome.jsp?cancellation=error");
     } finally {
-        try {
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        db.closeConnection(conn);
     }
 %>

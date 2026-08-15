@@ -162,21 +162,12 @@
 </head>
 <body>
 
-<% 
-	String username = (String) session.getAttribute("username");
+<%
+    if (!Auth.requireRole(request, response, Roles.CUSTOMER)) {
+        return;
+    }
+    String username = Auth.username(session);
 
-    if (session == null || username == null) {
-        response.sendRedirect("../login.jsp");
-        return;
-    }
-    
-    String role = (String) session.getAttribute("role");
-    
-    if (!role.equals("Customer")) {
-        response.sendRedirect("../403.jsp");
-        return;
-    }
-    
     String reservationStatus = request.getParameter("reservation");
     String cancellationStatus = request.getParameter("cancellation");
 
@@ -185,106 +176,32 @@
     List<Reservation> currentReservations = new ArrayList<>();
     List<Reservation> pastReservations = new ArrayList<>();
 
+    ApplicationDB appdb = new ApplicationDB();
     Connection conn = null;
-    PreparedStatement ps1 = null, ps2 = null;
-    ResultSet rs1 = null, rs2 = null;
-
     try {
-        ApplicationDB appdb = new ApplicationDB();
         conn = appdb.getConnection();
-
-        String query = "SELECT DISTINCT s.stationId, s.name, s.city, s.state FROM Stop " + 
-                       "JOIN Station s ON Stop.stopStation = s.stationId";
-        
-        ps1 = conn.prepareStatement(query);
-        rs1 = ps1.executeQuery();
-
-        while (rs1.next()) {        	
-        	uniqueStations.add(new Station(rs1.getInt("stationId"), rs1.getString("name"), rs1.getString("city"), rs1.getString("state")));
-        }
-        // Collections.sort(uniqueStations, (a, b) -> Integer.compare(a.getStationId(), b.getStationId()));
-            
-        String reservationQuery = 	"SELECT r.reservationNo, r.reservationDateTime, r.isRoundTrip, r.discount, " +
-        							"c.customerId, c.firstName AS customerFirstName, c.lastName AS customerLastName, c.email AS customerEmail, " + 
-        							"tl.lineId AS transitLineId, tl.lineName AS transitLineName, tl.trainId as trainId, r.totalFare AS transitLineFare, " + 
-        							"r.originStopId AS reservationOriginStopId, s1.stopStation AS reservationOriginStationId, rs1.name AS reservationOriginStationName, " + 
-        							"rs1.city AS reservationOriginCity, rs1.state AS reservationOriginState, s1.departureDateTime AS originStationDepartureTime, s1.arrivalDateTime AS originStationArrivalTime, " + 
-        							"r.destinationStopId AS reservationDestinationStopId, s2.stopStation AS reservationDestinationStationId, rs2.name AS reservationDestinationStationName, " + 
-        							"rs2.city AS reservationDestinationCity, rs2.state AS reservationDestinationState, s2.departureDateTime AS destinationStationDepartureTime, s2.arrivalDateTime AS destinationStationArrivalTime " +
-        							"FROM Reservation r JOIN Customer c ON r.customerId = c.customerId JOIN TransitLine tl ON r.transitLineId = tl.lineId " +
-        							"JOIN Stop s1 ON r.originStopId = s1.stopId	JOIN Stop s2 ON r.destinationStopId = s2.stopId JOIN Station rs1 ON s1.stopStation = rs1.stationId JOIN Station rs2 ON s2.stopStation = rs2.stationId " +
-        							"WHERE c.customerId = (SELECT customerId FROM Customer WHERE username = ?)";
-            
-        ps2 = conn.prepareStatement(reservationQuery);
-       	ps2.setString(1, username);
-      
-       	rs2 = ps2.executeQuery();
-       	
-        while (rs2.next()) {
-            int reservationNo = rs2.getInt("reservationNo");
-            String reservationDateTime = rs2.getString("reservationDateTime");
-            boolean isRoundTrip = rs2.getBoolean("isRoundTrip");
-            int discount = rs2.getInt("discount");
-            
-            int customerId = rs2.getInt("customerId");
-            String customerFirstName = rs2.getString("customerFirstName");
-            String customerLastName = rs2.getString("customerLastName");
-            String customerEmail = rs2.getString("customerEmail");
-
-            int transitLineId = rs2.getInt("transitLineId");
-            String transitLineName = rs2.getString("transitLineName");
-            int trainId = rs2.getInt("trainId");
-            float transitLineFare = rs2.getFloat("transitLineFare");
-            
-            int reservationOriginStopId = rs2.getInt("reservationOriginStopId");
-            int reservationOriginStationId = rs2.getInt("reservationOriginStationId");
-            String reservationOriginStationName = rs2.getString("reservationOriginStationName");
-            String reservationOriginCity = rs2.getString("reservationOriginCity");
-            String reservationOriginState = rs2.getString("reservationOriginState");
-            String originStationArrivalTime = rs2.getString("originStationArrivalTime");
-            String originStationDepartureTime = rs2.getString("originStationDepartureTime");
-
-            int reservationDestinationStopId = rs2.getInt("reservationDestinationStopId");
-            int reservationDestinationStationId = rs2.getInt("reservationDestinationStationId");
-            String reservationDestinationStationName = rs2.getString("reservationDestinationStationName");
-            String reservationDestinationCity = rs2.getString("reservationDestinationCity");
-            String reservationDestinationState = rs2.getString("reservationDestinationState");
-            String destinationStationArrivalTime = rs2.getString("destinationStationArrivalTime");
-            String destinationStationDepartureTime = rs2.getString("destinationStationDepartureTime");
-            
-            Reservation reservation = new Reservation(reservationNo, reservationDateTime, isRoundTrip, discount, customerId, customerFirstName, customerLastName, customerEmail, transitLineId, transitLineName, trainId, transitLineFare, 
-            											reservationOriginStopId, reservationOriginStationId, reservationOriginStationName, reservationOriginCity, reservationOriginState, originStationArrivalTime, originStationDepartureTime,
-									            		reservationDestinationStopId, reservationDestinationStationId, reservationDestinationStationName, reservationDestinationCity, reservationDestinationState, destinationStationArrivalTime, destinationStationDepartureTime);
-        
-
-			if (reservation.isPastReservation()) {
-				pastReservations.add(reservation);
-			} else {
-				currentReservations.add(reservation);
-			}
+        uniqueStations = new StationDao().listDistinctStopStations(conn);
+        for (Reservation reservation : new ReservationDao().listForUsername(conn, username)) {
+            if (reservation.isPastReservation()) {
+                pastReservations.add(reservation);
+            } else {
+                currentReservations.add(reservation);
+            }
         }
     } catch (SQLException e) {
         errorMessage = "Error loading stations: " + e.getMessage();
     } finally {
-        try {
-            if (rs2 != null) rs2.close();
-            if (ps2 != null) ps2.close();
-            if (rs1 != null) rs1.close();
-            if (ps1 != null) ps1.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        appdb.closeConnection(conn);
     }
 %>
 
 <div class="header">
-    <div class="username">Hello, <%= username %>!</div>
+    <div class="username">Hello, <%= Html.escape(username) %>!</div>
     <a href="../logout.jsp" class="logout-button">Logout</a>
 </div>
 
 <% if (errorMessage != null) { %>
-    <div style="color: red; margin-bottom: 20px;"><%= errorMessage %></div>
+    <div style="color: red; margin-bottom: 20px;"><%= Html.escape(errorMessage) %></div>
 <% } %>
 
 <div class="main-container">
@@ -328,7 +245,7 @@
 				<select name="originStationId" required>
 					<option value=""></option>
 					<% for (Station station : uniqueStations) { %>
-						<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+						<option value="<%= station.getStationId() %>"><%= Html.escape(station.toString()) %></option>
 					<% } %>
 				</select>
 				
@@ -336,12 +253,12 @@
 				<select name="destinationStationId" required>
 					<option value=""></option>
 					<% for (Station station : uniqueStations) { %>
-						<option value="<%= station.getStationId() %>"><%= station.toString() %></option>
+						<option value="<%= station.getStationId() %>"><%= Html.escape(station.toString()) %></option>
 					<% } %>
 				</select>
 				
 				<label>Date of Departure: </label>	            
-	            <input type="date" name="reservationDate" required value="<%= request.getParameter("reservationDate") %>">
+	            <input type="date" name="reservationDate" required value="<%= Html.escape(request.getParameter("reservationDate")) %>">
 				
 	            <input type="submit" value="View Schedules" />
 			</form>
@@ -369,49 +286,11 @@
 						</tr>
 					</thead>
 					<tbody>
-						<% for (Reservation reservation : currentReservations) { %>
-							<tr>
-								<td>
-									<b><i>#<%= reservation.getReservationNo() %></i></b><br><br>
-									<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
-									<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
-	 							</td>
-								<td>
-									<b>Name:</b> <%= reservation.getCustomerFirstName() %> <%= reservation.getCustomerLastName() %><br>
-									<b>Email:</b> <%= reservation.getCustomerEmail() %>
-	 							</td>
-								<td>
-									<b>Line:</b> <%= reservation.getTransitLineName() %> <br>
-									<b>Train:</b> <%= reservation.getTrainId() %>
-	 							</td>
-	 							<td>
-									<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>
-									<b>Location:</b> <%= reservation.getOrigin().getCity() %>, <%= reservation.getOrigin().getState() %> 
-	 							</td>
-	 							<td>
-	 								<b>Arrival:</b> <%= reservation.getFormattedOriginStationArrivalTime() %> <br>
-	 								<b>Departure:</b> <%= reservation.getFormattedOriginStationDepartureTime() %>
-	 							</td>
-	 							 <td>
-									<b>Name:</b> <%= reservation.getDestination().getName() %> <br>
-									<b>Location:</b> <%= reservation.getDestination().getCity() %>, <%= reservation.getDestination().getState() %> 
-	 							</td>
-	 							 <td>
-	 								<b>Arrival:</b> <%= reservation.getFormattedDestinationStationArrivalTime() %> <br>
-	 								<b>Departure:</b> <%= reservation.getFormattedDestinationStationDepartureTime() %>
-	 							</td>
-	 							<td>
-	 								<b>Total Cost:</b> <%= String.format("$%.2f", reservation.getOriginalFare()) %> <br>
-	 								<b>Discount <span style="color:green">(-<%= reservation.getDiscountRate() %>%)</span>:</b> <%= String.format("-$%.2f", reservation.getCustomerDiscount()) %> <br>
-	 								<b>Final Cost: <%= String.format("$%.2f", reservation.getCustomerFare()) %></b>
-	 							</td>
-			                    <td>
-					                <form action="cancelReservation.jsp" method="POST" style="display:inline">	                	
-					                	<input type="hidden" name="cancel" value="<%= reservation.getReservationNo() %>">
-									    <button type="submit" class="cancel-reservation">Cancel</button>
-									</form>
-			                    </td>
-							</tr>
+						<% for (Reservation reservation : currentReservations) {
+						    request.setAttribute("reservation", reservation);
+						    request.setAttribute("showCancel", Boolean.TRUE);
+						%>
+						    <jsp:include page="/WEB-INF/jspf/reservation-row.jspf" />
 						<% } %>
 					</tbody>
 				</table>
@@ -439,43 +318,11 @@
 							</tr>
 						</thead>
 						<tbody>
-							<% for (Reservation reservation : pastReservations) { %>
-								<tr>
-									<td>
-										<b><i>#<%= reservation.getReservationNo() %></i></b><br><br>
-										<b>Reserved At:</b> <%= reservation.getFormattedReservationDateTime() %> <br>
-										<b>Round Trip:</b> <%= reservation.isRoundTrip() ? "Yes" : "No" %>
-		 							</td>
-									<td>
-										<b>Name:</b> <%= reservation.getCustomerFirstName() %> <%= reservation.getCustomerLastName() %><br>
-										<b>Email:</b> <%= reservation.getCustomerEmail() %>
-		 							</td>
-									<td>
-										<b>Line:</b> <%= reservation.getTransitLineName() %> <br>
-										<b>Train:</b> <%= reservation.getTrainId() %>
-		 							</td>
-		 							<td>
-										<b>Name:</b> <%= reservation.getOrigin().getName() %> <br>
-										<b>Location:</b> <%= reservation.getOrigin().getCity() %>, <%= reservation.getOrigin().getState() %> 
-		 							</td>
-		 							<td>
-		 								<b>Arrival:</b> <%= reservation.getFormattedOriginStationArrivalTime() %> <br>
-		 								<b>Departure:</b> <%= reservation.getFormattedOriginStationDepartureTime() %>
-		 							</td>
-		 							 <td>
-										<b>Name:</b> <%= reservation.getDestination().getName() %> <br>
-										<b>Location:</b> <%= reservation.getDestination().getCity() %>, <%= reservation.getDestination().getState() %> 
-		 							</td>
-		 							 <td>
-		 								<b>Arrival:</b> <%= reservation.getFormattedDestinationStationArrivalTime() %> <br>
-		 								<b>Departure:</b> <%= reservation.getFormattedDestinationStationDepartureTime() %>
-		 							</td>
-		 							<td>
-		 								<b>Total Cost:</b> <%= String.format("$%.2f", reservation.getOriginalFare()) %> <br>
-		 								<b>Discount <span style="color:green">(-<%= reservation.getDiscountRate() %>%)</span>:</b> <%= String.format("-$%.2f", reservation.getCustomerDiscount()) %> <br>
-		 								<b>Final Cost: <%= String.format("$%.2f", reservation.getCustomerFare()) %></b>
-		 							</td>
-								</tr>
+							<% for (Reservation reservation : pastReservations) {
+							    request.setAttribute("reservation", reservation);
+							    request.setAttribute("showCancel", Boolean.FALSE);
+							%>
+							    <jsp:include page="/WEB-INF/jspf/reservation-row.jspf" />
 							<% } %>
 						</tbody>
 					</table>
