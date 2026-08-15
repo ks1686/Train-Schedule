@@ -169,29 +169,53 @@
 </head>
 <body>
 
-<% 
-	String username = (String) session.getAttribute("username");
-
-    if (session == null || username == null) {
-        response.sendRedirect("../login.jsp");
+<%
+    if (!Auth.requireRole(request, response, Roles.CUSTOMER)) {
         return;
     }
-    
-    String role = (String) session.getAttribute("role");
-    
-    if (!role.equals("Customer")) {
-        response.sendRedirect("../403.jsp");
-        return;
-    }
-
+    String username = Auth.username(session);
     String errorMessage = null;
-    
+
+    if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("reserve") != null && !Csrf.isValid(request)) {
+        response.sendRedirect("viewSchedules.jsp");
+        return;
+    }
+
     String lineId = request.getParameter("reserve");
-    LineSchedule sched = (LineSchedule) session.getAttribute("line: " + lineId);
+    if (lineId == null) {
+        lineId = (String) session.getAttribute("reserveLineId");
+    }
+    Integer originStationId = null;
+    Integer destinationStationId = null;
+    try {
+        String origin = (String) session.getAttribute("originStationId");
+        String dest = (String) session.getAttribute("destinationStationId");
+        if (origin != null && !origin.isEmpty()) originStationId = Integer.valueOf(origin);
+        if (dest != null && !dest.isEmpty()) destinationStationId = Integer.valueOf(dest);
+    } catch (NumberFormatException ignored) {}
+
+    LineSchedule sched = null;
+    ApplicationDB appdb = new ApplicationDB();
+    Connection conn = null;
+    try {
+        if (lineId != null) {
+            session.setAttribute("reserveLineId", lineId);
+            conn = appdb.getConnection();
+            sched = new ScheduleDao().loadLine(conn, Integer.parseInt(lineId), originStationId, destinationStationId);
+        }
+    } catch (Exception e) {
+        errorMessage = "Error loading schedule: " + e.getMessage();
+    } finally {
+        appdb.closeConnection(conn);
+    }
+    if (sched == null) {
+        response.sendRedirect("viewSchedules.jsp");
+        return;
+    }
 %>
 
 <div class="header">
-    <div class="username">Hello, <%= username %>!</div>
+    <div class="username">Hello, <%= Html.escape(username) %>!</div>
     <form class="clear-button" method="POST" action="viewSchedules.jsp">
     	<button name="clear">Clear And Go Back</button>
     </form>
@@ -199,7 +223,7 @@
 </div>
 
 <% if (errorMessage != null) { %>
-    <div style="color: red; margin-bottom: 20px;"><%= errorMessage %></div>
+    <div style="color: red; margin-bottom: 20px;"><%= Html.escape(errorMessage) %></div>
 <% } %>
 
 <div class="main-container">
@@ -220,11 +244,11 @@
         <tbody>
 		    <tr>
                 <td><%= sched.getTrainId() %></td>
-		        <td><%= sched.getLineName() %></td>
-		        <td><%= sched.getOrigin().toString() %></td>
-		        <td><%= sched.getFormattedDepartureDateTime() %></td>
-		        <td><%= sched.getDestination().toString() %></td>
-		        <td><%= sched.getFormattedArrivalDateTime() %></td>
+		        <td><%= Html.escape(sched.getLineName()) %></td>
+		        <td><%= Html.escape(sched.getOrigin().toString()) %></td>
+		        <td><%= Html.escape(sched.getFormattedDepartureDateTime()) %></td>
+		        <td><%= Html.escape(sched.getDestination().toString()) %></td>
+		        <td><%= Html.escape(sched.getFormattedArrivalDateTime()) %></td>
 		        <td><b>$<%= String.format("%.02f", sched.getEstimatedFare()) %></b></td>
 		    </tr>
         </tbody>      
@@ -250,9 +274,9 @@
 	            List<Object[]> lineStops = sched.getStops();
 	            for (int ii = 0; ii < lineStops.size(); ii++) {
 	                Object[] stop = lineStops.get(ii);
-	                String stationName = stop[1].toString();
-	                String arrivalTime = (String) stop[2], departureTime = (String) stop[3];
-	                String color = (String) stop[4];
+	                String stationName = Html.escape(stop[1].toString());
+	                String arrivalTime = Html.escape((String) stop[2]), departureTime = Html.escape((String) stop[3]);
+	                String color = Html.escape((String) stop[4]);
 	                boolean bold = (boolean) stop[5];
 	                
 	                float estimatedFare = sched.getEstimatedFare(ii);
@@ -310,7 +334,8 @@
    	<br>
    	<div class="finalizeForm">
 	    <form method="POST" action="placeReservation.jsp">
-	    	<input type="hidden" name="reserve" value="<%= lineId %>">
+	    	<%= Csrf.hiddenField(session) %>
+	    	<input type="hidden" name="reserve" value="<%= Html.escape(lineId) %>">
 	    
 	    	<label>Trip Type:</label>
 	        <label>
