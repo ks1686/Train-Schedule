@@ -51,6 +51,7 @@ public class Reservation {
 		this.transitLineId = transitLineId;
 		this.transitLineName = transitLineName;
 		this.trainId = trainId;
+		this.customerFare = transitLineFare;
 		this.transitLineFare = transitLineFare;
 		
 		this.originStopId = reservationOriginStopId;
@@ -67,11 +68,15 @@ public class Reservation {
 	}
 	
 	private void calculateCustomerFareAndDiscount() {
-		int multiplier = isRoundTrip ? 2 : 1;
-		
-		this.originalFare = transitLineFare * multiplier;
-		this.customerDiscount = originalFare * ((float) discountRate/100);
-		this.customerFare = originalFare - customerDiscount;
+		// totalFare is the charged amount already. Recover display fields from it.
+		float remainingRate = 1f - (discountRate / 100f);
+		if (remainingRate <= 0f) {
+			this.originalFare = customerFare;
+			this.customerDiscount = 0f;
+			return;
+		}
+		this.originalFare = customerFare / remainingRate;
+		this.customerDiscount = originalFare - customerFare;
 	}
 
 	public int getReservationNo() { return reservationNo; }
@@ -112,11 +117,11 @@ public class Reservation {
 
 	public LocalDateTime getOriginStationArrivalTime() { return originStationArrivalTime; }
 
-	public String getFormattedOriginStationArrivalTime() { return originStationArrivalTime.format(DateTimeConversion.dateTimeFormatter); }
+	public String getFormattedOriginStationArrivalTime() { return formatTime(originStationArrivalTime); }
 
 	public LocalDateTime getOriginStationDepartureTime() { return originStationDepartureTime; }
 
-	public String getFormattedOriginStationDepartureTime() { return originStationDepartureTime.format(DateTimeConversion.dateTimeFormatter); }
+	public String getFormattedOriginStationDepartureTime() { return formatTime(originStationDepartureTime); }
 	
 	public int getDestinationStopId() { return destinationStopId; }
 
@@ -124,16 +129,22 @@ public class Reservation {
 
 	public LocalDateTime getDestinationStationArrivalTime() { return destinationStationArrivalTime; }
 
-	public String getFormattedDestinationStationArrivalTime() { return destinationStationArrivalTime.format(DateTimeConversion.dateTimeFormatter); }
+	public String getFormattedDestinationStationArrivalTime() { return formatTime(destinationStationArrivalTime); }
 
 	public LocalDateTime getDestinationStationDepartureTime() { return destinationStationDepartureTime; }
 
-	public String getFormattedDestinationStationDepartureTime() { return destinationStationDepartureTime.format(DateTimeConversion.dateTimeFormatter); }
+	public String getFormattedDestinationStationDepartureTime() { return formatTime(destinationStationDepartureTime); }
 
 	public boolean isPastReservation() {
 		LocalDateTime destinationArrival = destinationStationDepartureTime != null ? destinationStationDepartureTime : destinationStationArrivalTime;
-		
+		if (destinationArrival == null) {
+			return false;
+		}
 		return LocalDateTime.now().isAfter(destinationArrival);
+	}
+
+	private static String formatTime(LocalDateTime value) {
+		return value == null ? "" : value.format(DateTimeConversion.dateTimeFormatter);
 	}
 	
 	public String toString() {

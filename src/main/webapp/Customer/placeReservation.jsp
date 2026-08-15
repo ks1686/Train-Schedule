@@ -16,61 +16,55 @@
         return;
     }
 
+    if (!"POST".equalsIgnoreCase(request.getMethod()) || !Csrf.isValid(request)) {
+        response.sendRedirect("customerWelcome.jsp?reservation=failure");
+        return;
+    }
+
     String lineId = request.getParameter("reserve");
-    LineSchedule sched = (LineSchedule) session.getAttribute("line: " + lineId);
+    String tripType = request.getParameter("tripType");
+    String ageParam = request.getParameter("age");
+    String disability = request.getParameter("disability");
+    if (lineId == null || tripType == null || ageParam == null || disability == null) {
+        response.sendRedirect("customerWelcome.jsp?reservation=failure");
+        return;
+    }
 
-    int originStopId = (int) sched.getStops().get(sched.getOriginIndex())[0];
-    int destinationStopId = (int) sched.getStops().get(sched.getDestinationIndex())[0];
+    int age;
+    try {
+        age = Integer.parseInt(ageParam);
+    } catch (NumberFormatException e) {
+        response.sendRedirect("customerWelcome.jsp?reservation=failure");
+        return;
+    }
+    int discount = FareCalculator.discountFor(age, "yes".equals(disability));
+    boolean roundTrip = "round".equals(tripType);
 
-    String tripType = request.getParameter("tripType") != null ? request.getParameter("tripType") : "oneway";
-    String age = request.getParameter("age") != null ? request.getParameter("age") : "21";
-    String disability = request.getParameter("disability") != null ? request.getParameter("disability") : "no";
-    
-    int discount = 0;
-	if (disability.equals("yes")) {
-		discount = 50;
-	} else if (((int) Integer.valueOf(age)) >= 65) {
-		discount = 35;
-	} else if (((int) Integer.valueOf(age)) <= 12) {
-		discount = 25;
-	}
-    
+    Integer originStationId = null;
+    Integer destinationStationId = null;
+    try {
+        String origin = (String) session.getAttribute("originStationId");
+        String dest = (String) session.getAttribute("destinationStationId");
+        if (origin != null) originStationId = Integer.valueOf(origin);
+        if (dest != null) destinationStationId = Integer.valueOf(dest);
+    } catch (NumberFormatException ignored) {
+    }
+
     Connection conn = null;
-    PreparedStatement ps = null;
-
     try {
         ApplicationDB db = new ApplicationDB();
-        conn = db.getConnection();       
-        
-        String reservationInsertion = 	"INSERT INTO Reservation (customerId, transitLineId, originStopId, destinationStopId, reservationDateTime, isRoundTrip, discount, totalFare) " +
-        								"VALUES ((SELECT customerId FROM Customer WHERE username = ?), ?, ?, ?, ?, ?, ?, ?)";
-        		
-        ps = conn.prepareStatement(reservationInsertion);
-       	ps.setString(1, username);
-       	ps.setInt(2, sched.getLineId());
-       	ps.setInt(3, originStopId);
-       	ps.setInt(4, destinationStopId);
-       	ps.setString(5, LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-       	ps.setBoolean(6, tripType.equals("round") ? true : false); 
-       	ps.setInt(7, discount);
-       	ps.setFloat(8, sched.getEstimatedFare());
-
-        int rowsUpdated = ps.executeUpdate();
-
+        conn = db.getConnection();
+        LineSchedule sched = new ScheduleDao().loadLine(conn, Integer.parseInt(lineId), originStationId, destinationStationId);
+        int rowsUpdated = new ReservationDao().insert(conn, username, sched, roundTrip, discount);
         if (rowsUpdated > 0) {
             response.sendRedirect("customerWelcome.jsp?reservation=success");
         } else {
             response.sendRedirect("customerWelcome.jsp?reservation=failure");
         }
-    } catch (SQLException e) {
+    } catch (Exception e) {
         e.printStackTrace();
         response.sendRedirect("customerWelcome.jsp?reservation=error");
     } finally {
-        try {
-            if (ps != null) ps.close();
-            if (conn != null) conn.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        if (conn != null) try { conn.close(); } catch (SQLException e) { e.printStackTrace(); }
     }
 %>

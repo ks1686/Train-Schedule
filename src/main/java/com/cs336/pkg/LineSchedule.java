@@ -86,11 +86,15 @@ public class LineSchedule {
 	public float getLineFare() { return lineFare; }	
 	
 	public float getEstimatedFare(int index) {
-		float pricePerStop = lineFare/(stops.size() - 1);
-		int traveledStops = index - getOriginIndex();
-		if (traveledStops < 0) return -1;
-		
-		return pricePerStop * traveledStops;
+		if (stops.size() < 2 || getOriginIndex() < 0) {
+			return -1;
+		}
+		int hops = index - getOriginIndex();
+		if (hops < 0) {
+			return -1;
+		}
+		float pricePerStop = lineFare / Math.max(1, stops.size() - 1);
+		return pricePerStop * hops;
 	}
 	
 	public float getEstimatedFare() {
