@@ -108,18 +108,16 @@
         // SQL query to get the sales report data for the given month and year
         String query = "SELECT t.lineName AS 'Line Name', " +
                        "COUNT(r.reservationNo) AS 'Total Reservations', " +
-                       "SUM(CASE WHEN r.isRoundTrip = TRUE " +
-                       "         THEN (r.totalFare * 2 * (1 - r.discount / 100)) " +
-                       "         ELSE (r.totalFare * (1 - r.discount / 100)) " +
-                       "	END) AS 'Total Revenue' " +
+                       "SUM(r.totalFare) AS 'Total Revenue' " +
                        "FROM Reservation r " +
                        "JOIN TransitLine t ON r.transitLineId = t.lineId " +
-                       "WHERE MONTH(r.reservationDateTime) = ? AND YEAR(r.reservationDateTime) = ? " +
+                       "WHERE r.reservationDateTime >= ? AND r.reservationDateTime < ? " +
                        "GROUP BY t.lineName";
         
+        java.time.LocalDate start = java.time.LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
         ps = conn.prepareStatement(query);
-        ps.setInt(1, Integer.parseInt(month));
-        ps.setInt(2, Integer.parseInt(year));
+        ps.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
+        ps.setTimestamp(2, java.sql.Timestamp.valueOf(start.plusMonths(1).atStartOfDay()));
         rs = ps.executeQuery();
 
         // Displaying the report table
