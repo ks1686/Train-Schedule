@@ -62,7 +62,9 @@
         conn = appdb.getConnection();
         uniqueStations = new StationDao().listDistinctStopStations(conn);
         if (originId != null && destId != null && reservationDate != null && !reservationDate.isEmpty()) {
-            scheduleRes = new ScheduleDao().search(conn, originId, destId, LocalDate.parse(reservationDate));
+            // putAll (not reassignment) keeps scheduleRes effectively final so the
+            // sort lambdas below can legally capture it.
+            scheduleRes.putAll(new ScheduleDao().search(conn, originId, destId, LocalDate.parse(reservationDate)));
             keyOrder.addAll(scheduleRes.keySet());
 
             if (departureTimeSort.equals("desc")) {

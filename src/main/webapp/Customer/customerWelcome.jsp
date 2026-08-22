@@ -145,7 +145,7 @@
 						    request.setAttribute("reservation", reservation);
 						    request.setAttribute("showCancel", Boolean.TRUE);
 						%>
-						    <jsp:include page="/WEB-INF/jspf/reservation-row.jspf" />
+						    <jsp:include page="/WEB-INF/jspf/reservation-row.jsp" />
 						<% } %>
 					</tbody>
 				</table>
@@ -177,7 +177,7 @@
 							    request.setAttribute("reservation", reservation);
 							    request.setAttribute("showCancel", Boolean.FALSE);
 							%>
-							    <jsp:include page="/WEB-INF/jspf/reservation-row.jspf" />
+							    <jsp:include page="/WEB-INF/jspf/reservation-row.jsp" />
 							<% } %>
 						</tbody>
 					</table>

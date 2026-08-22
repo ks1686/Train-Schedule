@@ -6,6 +6,20 @@ This project is a Train Reservation System that allows customers to make reserva
 
 [![Transit Application Demo](assets/transit-demo.gif "https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link")](https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link)
 
+## Quick Demo (Docker)
+
+One command builds the app and brings up MySQL + Tomcat 9 with seeded data:
+
+```bash
+./demo.sh
+```
+
+Then open **http://localhost:8080/train-schedule/** (set `TRAIN_SCHEDULE_PORT` to use a different port). Bookable trains are seeded from **one week out from today** for the next 31 days — search any date in that window. Tear it all down with:
+
+```bash
+docker compose down -v
+```
+
 ### Entity Relation Diagram (ERD)
 <p align="center">
     <picture>
@@ -66,6 +80,9 @@ All functionality from the checklist has been implemented.
 ```
 .
 ├── pom.xml
+├── Dockerfile                  # WAR build + Tomcat 9 runtime
+├── docker-compose.yml          # MySQL 8 + Tomcat 9 stack
+├── demo.sh                     # one-command demo
 ├── assets/
 ├── src/main/java/com/cs336/pkg/     # helpers, DAOs, models, AuthFilter
 ├── src/main/webapp/                 # JSPs, css/app.css, WEB-INF
@@ -99,19 +116,23 @@ Seed passwords in `table_data.sql` are plaintext for first login. The app hashes
 
 ## How to Test
 
-1. **Set Up the Database**:
+1. **One-command demo (recommended)**:
+    - `./demo.sh` — builds the WAR, seeds MySQL, serves on port 8080. No local MySQL or Tomcat needed.
+    - `python3 tests/buildMockTransit.py` regenerates `tests/sql/table_data.sql` around today's date whenever you want to roll the seed window forward.
+
+2. **Set Up the Database manually**:
     - MySQL running locally.
     - Fresh install: `schema.sql` then `table_data.sql`.
     - Existing `trains` DB from the original schema: `tests/sql/migrate_from_v1.sql`.
 
-2. **Configure Database Connection**:
+3. **Configure Database Connection**:
     - Optional env vars: `DB_URL`, `DB_USER`, `DB_PASSWORD`. Defaults still work for local root with an empty password.
 
-3. **Tomcat 9**:
+4. **Tomcat 9**:
     - Eclipse + Tomcat 9 still works (`.classpath` / `.project`).
     - Or `mvn package` and deploy `target/train-schedule.war`.
     - Connector/J 8 and jBCrypt are in `src/main/webapp/WEB-INF/lib/`.
 
-4. **Unit tests** (no Tomcat): compile `src/test/java` with JUnit 4 against `src/main/java`.
+5. **Unit tests** (no Tomcat): `./mvnw test`.
 
-5. **Manual smoke**: login POST as the three roles; a customer cannot cancel another user's reservation; manager cannot add a Manager or delete self; employee passwords never appear in page source.
+6. **Manual smoke**: login POST as the three roles; a customer cannot cancel another user's reservation; manager cannot add a Manager or delete self; employee passwords never appear in page source.

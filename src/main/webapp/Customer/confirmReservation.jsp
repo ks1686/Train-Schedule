@@ -45,11 +45,18 @@
     LineSchedule sched = null;
     ApplicationDB appdb = new ApplicationDB();
     Connection conn = null;
+    int lineIdNum = 0;
+    try {
+        lineIdNum = Integer.parseInt(lineId.trim());
+    } catch (NumberFormatException e) {
+        response.sendRedirect("viewSchedules.jsp");
+        return;
+    }
     try {
         if (lineId != null) {
             session.setAttribute("reserveLineId", lineId);
             conn = appdb.getConnection();
-            sched = new ScheduleDao().loadLine(conn, Integer.parseInt(lineId), originStationId, destinationStationId);
+            sched = new ScheduleDao().loadLine(conn, lineIdNum, originStationId, destinationStationId);
         }
     } catch (Exception e) {
         errorMessage = "Error loading schedule: " + e.getMessage();

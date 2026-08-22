@@ -16,6 +16,22 @@
         return;
     }
 
+    int monthValue;
+    int yearValue;
+    try {
+        monthValue = Integer.parseInt(month.trim());
+        yearValue = Integer.parseInt(year.trim());
+    } catch (NumberFormatException e) {
+        out.println("<p>Error: Invalid month or year. Please pick a month and year and try again.</p>");
+        return;
+    }
+    if (monthValue < 1 || monthValue > 12 || yearValue < 1 || String.valueOf(yearValue).length() > 4) {
+        out.println("<p>Error: Invalid month or year. Please pick a month and year and try again.</p>");
+        return;
+    }
+    final int monthNum = monthValue;
+    final int yearNum = yearValue;
+
     Connection conn = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -33,7 +49,7 @@
                        "WHERE r.reservationDateTime >= ? AND r.reservationDateTime < ? " +
                        "GROUP BY t.lineName";
         
-        java.time.LocalDate start = java.time.LocalDate.of(Integer.parseInt(year), Integer.parseInt(month), 1);
+        java.time.LocalDate start = java.time.LocalDate.of(yearNum, monthNum, 1);
         ps = conn.prepareStatement(query);
         ps.setTimestamp(1, java.sql.Timestamp.valueOf(start.atStartOfDay()));
         ps.setTimestamp(2, java.sql.Timestamp.valueOf(start.plusMonths(1).atStartOfDay()));
@@ -44,7 +60,7 @@
         out.println("<head><title>Sales Report</title></head>");
         out.println("<body>");
         out.println("<div class='header'>Sales Report</div>");
-        out.println("<h2>Sales Report for " + new java.text.DateFormatSymbols().getMonths()[Integer.parseInt(month) - 1] + " " + year + "</h2>");
+        out.println("<h2>Sales Report for " + new java.text.DateFormatSymbols().getMonths()[monthNum - 1] + " " + yearNum + "</h2>");
         out.println("<table border='1'>");
         out.println("<thead>");
         out.println("<tr>");

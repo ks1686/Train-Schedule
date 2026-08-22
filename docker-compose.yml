@@ -1,0 +1,23 @@
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: trains
+    volumes:
+      - ./tests/sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./tests/sql/table_data.sql:/docker-entrypoint-initdb.d/02-table_data.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${TRAIN_SCHEDULE_PORT:-8080}:8080"
