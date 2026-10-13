@@ -95,7 +95,7 @@ public class DaoTest {
     @Test
     public void searchFindsLineInTravelDirectionOnly() throws SQLException {
         ScheduleDao dao = new ScheduleDao();
-        LocalDate day = LocalDate.of(2026, 8, 29);
+        LocalDate day = firstDepartureDateOfLine1();
 
         Map<Integer, LineSchedule> forward = dao.search(conn, 1, 14, day);
         LineSchedule line1 = forward.get(1);
@@ -116,6 +116,15 @@ public class DaoTest {
 
         assertEquals(1, reservations.insert(conn, "bobw", sched, false, 0));
         assertEquals(before + 1, reservations.listForUsername(conn, "bobw").size());
+    }
+
+    /** Seed dates move whenever tests/buildMockTransit.py is re-run, so read them from the data. */
+    private LocalDate firstDepartureDateOfLine1() throws SQLException {
+        try (Statement st = conn.createStatement();
+                java.sql.ResultSet rs = st.executeQuery("SELECT MIN(departureDateTime) FROM Stop WHERE stopLine = 1")) {
+            rs.next();
+            return rs.getTimestamp(1).toLocalDateTime().toLocalDate();
+        }
     }
 
     private int firstReservationNo(String username) throws SQLException {

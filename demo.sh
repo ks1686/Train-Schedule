@@ -6,6 +6,16 @@ cd "$(dirname "$0")"
 
 PORT="${TRAIN_SCHEDULE_PORT:-8080}"
 
+# The committed seed data is dated relative to the day it was generated, so it
+# goes stale. Regenerate it so the schedule window starts a week from today.
+if command -v python3 >/dev/null 2>&1; then
+  echo "==> Regenerating seed data relative to today..."
+  python3 tests/buildMockTransit.py
+  echo "    Note: an existing database volume keeps its old data; run 'docker compose down -v' first to reseed."
+else
+  echo "==> python3 not found; using committed seed data (dates may be in the past)."
+fi
+
 echo "==> Starting MySQL and Tomcat (first run downloads images)..."
 docker compose up --build --detach
 
