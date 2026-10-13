@@ -27,7 +27,8 @@
     if (ssn == null || ssn.isEmpty()
             || username == null || username.isEmpty()
             || firstName == null || firstName.isEmpty()
-            || lastName == null || lastName.isEmpty()) {
+            || lastName == null || lastName.isEmpty()
+            || (password != null && !password.isEmpty() && !Passwords.isAcceptable(password))) {
         response.sendRedirect("managerWelcome.jsp?update=failure");
         return;
     }

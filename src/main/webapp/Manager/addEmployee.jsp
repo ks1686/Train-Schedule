@@ -27,7 +27,7 @@
             || firstName == null || firstName.isEmpty()
             || lastName == null || lastName.isEmpty()
             || usernameInput == null || usernameInput.isEmpty()
-            || password == null || password.isEmpty()) {
+            || !Passwords.isAcceptable(password)) {
         response.sendRedirect("managerWelcome.jsp?add=failure");
         return;
     }
