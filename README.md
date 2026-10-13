@@ -152,3 +152,7 @@ Seed passwords in `table_data.sql` are plaintext for first login. The app hashes
 5. **Tests** (no Tomcat or MySQL needed): `./mvnw test`. `DaoTest` loads `schema.sql` and `table_data.sql` into in-memory H2 (MySQL mode). Static analysis: `./mvnw spotbugs:check`. CI runs tests, the WAR build, SpotBugs, and a check that the WAR bundles a single JDBC driver.
 
 6. **Manual smoke**: login POST as the three roles; a customer cannot cancel another user's reservation; manager cannot add a Manager or delete self; employee passwords never appear in page source.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
