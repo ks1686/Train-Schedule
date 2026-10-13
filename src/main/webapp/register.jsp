@@ -26,14 +26,17 @@
                     && username != null && password != null && firstName != null && lastName != null && email != null) {
                 if (!Csrf.isValid(request)) {
                     errorMessage = "Invalid request. Please try again.";
+                } else if (username.trim().isEmpty() || firstName.trim().isEmpty()
+                        || lastName.trim().isEmpty() || email.trim().isEmpty()) {
+                    errorMessage = "All fields are required.";
                 } else if (username.length() > 10) {
                     errorMessage = "Username must be 10 characters or fewer.";
                 } else if (firstName.length() > 25) {
                     errorMessage = "First name must be 25 characters or fewer.";
                 } else if (lastName.length() > 25) {
                     errorMessage = "Last name must be 25 characters or fewer.";
-                } else if (password.length() > 72) {
-                    errorMessage = "Password must be 72 characters or fewer.";
+                } else if (!Passwords.isAcceptable(password)) {
+                    errorMessage = "Password must be 1 to 72 bytes long.";
                 } else if (email.length() > 100) {
                     errorMessage = "Email must be 100 characters or fewer.";
                 } else {
