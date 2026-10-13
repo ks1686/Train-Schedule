@@ -29,6 +29,12 @@ jobs:
       - name: Package WAR
         run: ./mvnw -B package -DskipTests
 
+      - name: Check WAR bundles exactly one JDBC driver
+        run: |
+          count=$(unzip -l target/train-schedule.war | grep -c 'WEB-INF/lib/mysql-connector')
+          echo "mysql-connector jars in WAR: $count"
+          test "$count" -eq 1
+
       - name: Upload WAR artifact
         uses: actions/upload-artifact@v4
         with:

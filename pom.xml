@@ -60,7 +60,6 @@
                 <version>3.4.0</version>
                 <configuration>
                     <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                    <packagingExcludes>WEB-INF/lib/mysql-connector-java-5.1.49-bin.jar</packagingExcludes>
                 </configuration>
             </plugin>
         </plugins>
