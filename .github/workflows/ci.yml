@@ -29,6 +29,9 @@ jobs:
       - name: Package WAR
         run: ./mvnw -B package -DskipTests
 
+      - name: SpotBugs
+        run: ./mvnw -B spotbugs:check
+
       - name: Check WAR bundles exactly one JDBC driver
         run: |
           count=$(unzip -l target/train-schedule.war | grep -c 'WEB-INF/lib/mysql-connector')

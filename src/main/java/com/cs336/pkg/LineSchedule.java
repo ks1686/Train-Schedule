@@ -101,5 +101,5 @@ public class LineSchedule {
 		return getEstimatedFare(getDestinationIndex());
 	}
 	
-	public List<Object[]> getStops() { return stops; }
+	public List<Object[]> getStops() { return Collections.unmodifiableList(stops); }
 }
