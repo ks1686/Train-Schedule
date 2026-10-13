@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a Train Reservation System that allows customers to make reservations for train journeys, employees to manage customer queries, and managers to oversee operations. The system is built using Java and SQL.
+This project is a Train Reservation System that allows customers to make reservations for train journeys, employees to manage customer queries, and managers to oversee operations. It is a Java 8 web app (JSP and servlets on Tomcat 9) backed by MySQL 8 through JDBC, built with Maven as a WAR.
 
 [![Transit Application Demo](assets/transit-demo.gif "https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link")](https://drive.google.com/file/d/1MTzI_Nyt1bbQcP5qQSDr59PSUrJYX6i4/view?usp=drive_link)
 
@@ -14,11 +14,28 @@ One command builds the app and brings up MySQL + Tomcat 9 with seeded data:
 ./demo.sh
 ```
 
-Then open **http://localhost:8080/train-schedule/** (set `TRAIN_SCHEDULE_PORT` to use a different port). Bookable trains are seeded from **one week out from today** for the next 31 days — search any date in that window. Tear it all down with:
+Then open **http://localhost:8080/train-schedule/** (set `TRAIN_SCHEDULE_PORT` to use a different port). `demo.sh` regenerates the seed data (with `python3`) so bookable trains start **one week out from today** and run for 31 days; search any date in that window. Without `python3` it falls back to the committed `tests/sql/table_data.sql`, whose dates may be in the past. Tear it all down with:
 
 ```bash
 docker compose down -v
 ```
+
+## Architecture
+
+```mermaid
+flowchart LR
+    Browser -->|HTTP| Filter[AuthFilter<br/>role gate on /Customer, /Manager, /Representative]
+    Browser -->|login, register| PublicJSP[login.jsp / register.jsp]
+    Filter --> RoleJSP[Role JSPs<br/>Customer, Manager, Representative]
+    PublicJSP --> Helpers[Auth, Csrf, Passwords bcrypt, Html escape]
+    RoleJSP --> Helpers
+    RoleJSP --> DAOs[ScheduleDao, StationDao, ReservationDao]
+    PublicJSP --> DB
+    DAOs --> DB[ApplicationDB<br/>DB_URL / DB_USER / DB_PASSWORD]
+    DB -->|JDBC, prepared statements| MySQL[(MySQL 8<br/>schema.sql + table_data.sql)]
+```
+
+All JSPs and helpers run inside Tomcat 9. Some JSPs still issue their own prepared statements through `ApplicationDB` rather than a DAO.
 
 ### Entity Relation Diagram (ERD)
 <p align="center">
@@ -89,7 +106,7 @@ All functionality from the checklist has been implemented.
 │   ├── Customer/placeReservation.jsp
 │   ├── Manager/
 │   └── Representative/
-├── src/test/java/com/cs336/pkg/     # JUnit for dates, passwords, fares
+├── src/test/java/com/cs336/pkg/     # JUnit: dates, passwords, fares, DAOs on H2
 └── tests/
     ├── buildMockTransit.py
     └── sql/
@@ -117,7 +134,7 @@ Seed passwords in `table_data.sql` are plaintext for first login. The app hashes
 ## How to Test
 
 1. **One-command demo (recommended)**:
-    - `./demo.sh` — builds the WAR, seeds MySQL, serves on port 8080. No local MySQL or Tomcat needed.
+    - `./demo.sh`: builds the WAR, seeds MySQL, serves on port 8080. No local MySQL or Tomcat needed.
     - `python3 tests/buildMockTransit.py` regenerates `tests/sql/table_data.sql` around today's date whenever you want to roll the seed window forward.
 
 2. **Set Up the Database manually**:
@@ -132,6 +149,6 @@ Seed passwords in `table_data.sql` are plaintext for first login. The app hashes
     - `./mvnw package` and deploy `target/train-schedule.war`. Maven bundles Connector/J and jBCrypt into the WAR.
     - To use Eclipse, import the folder as an existing Maven project.
 
-5. **Unit tests** (no Tomcat): `./mvnw test`.
+5. **Tests** (no Tomcat or MySQL needed): `./mvnw test`. `DaoTest` loads `schema.sql` and `table_data.sql` into in-memory H2 (MySQL mode). Static analysis: `./mvnw spotbugs:check`. CI runs tests, the WAR build, SpotBugs, and a check that the WAR bundles a single JDBC driver.
 
 6. **Manual smoke**: login POST as the three roles; a customer cannot cancel another user's reservation; manager cannot add a Manager or delete self; employee passwords never appear in page source.
