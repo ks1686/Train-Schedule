@@ -129,9 +129,8 @@ Seed passwords in `table_data.sql` are plaintext for first login. The app hashes
     - Optional env vars: `DB_URL`, `DB_USER`, `DB_PASSWORD`. Defaults still work for local root with an empty password.
 
 4. **Tomcat 9**:
-    - Eclipse + Tomcat 9 still works (`.classpath` / `.project`).
-    - Or `mvn package` and deploy `target/train-schedule.war`.
-    - Connector/J 8 and jBCrypt are in `src/main/webapp/WEB-INF/lib/`.
+    - `./mvnw package` and deploy `target/train-schedule.war`. Maven bundles Connector/J and jBCrypt into the WAR.
+    - To use Eclipse, import the folder as an existing Maven project.
 
 5. **Unit tests** (no Tomcat): `./mvnw test`.
 

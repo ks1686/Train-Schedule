@@ -5,3 +5,10 @@ cs336FinalProject.iml
 build/
 *.class
 target/
+
+# Eclipse and agent tooling
+.classpath
+.project
+.settings/
+.vscode/
+.cursor/
